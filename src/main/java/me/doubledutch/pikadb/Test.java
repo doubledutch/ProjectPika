@@ -6,11 +6,13 @@ import java.util.*;
 public class Test{
 	public static void main(String args[]){
 		String filename="./test.data";
-		int RECORDS=10000;
+		int RECORDS=100000;
 		try{
 			
-			System.out.println("Running test");
+			System.out.println("Running test "+RECORDS);
 
+
+			long pre=System.currentTimeMillis();
 			PageFile f=new PageFile(filename);
 			Page p1=f.createPage();
 			Column col=new Column(f,p1.getId());
@@ -23,9 +25,14 @@ public class Test{
 			f.saveChanges();
 			f.close();
 
+			long post=System.currentTimeMillis();
+
+			System.out.println(" Write in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" var/s");
+
 			File ftest=new File(filename);
 			System.out.println("length:"+ftest.length());
 
+			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
 			col=new Column(f,0);
 			System.out.println("Ready to scan");
@@ -42,7 +49,8 @@ public class Test{
 				}
 			}
 			f.close();
-
+			post=System.currentTimeMillis();
+			System.out.println(" Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" var/s");
 			 
 			
 		}catch(Exception e){

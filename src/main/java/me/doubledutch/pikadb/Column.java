@@ -33,7 +33,7 @@ public class Column{
 	}
 
 	private List<Variant> scan(Page page) throws IOException{
-		System.out.println("scan("+page.getId()+")");
+		// System.out.println("scan("+page.getId()+")");
 		List<Variant> list=new LinkedList<Variant>();
 		DataInput in=page.getDataInput();
 		Variant v=Variant.readVariant(in);
@@ -50,7 +50,7 @@ public class Column{
 		while(page!=null){
 			list.addAll(scan(page));
 			int next=page.getNextPageId();
-			System.out.println("next:"+next);
+			// System.out.println("next:"+next);
 			if(next>-1){
 				page=pageFile.getPage(next);
 			}else{

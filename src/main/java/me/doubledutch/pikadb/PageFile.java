@@ -28,7 +28,7 @@ public class PageFile{
 	}
 
 	public Page createPage() throws IOException{
-		System.out.println("Create page");
+		// System.out.println("Create page");
 		int id=getPageCount();
 		pageFile.setLength(pageFile.length()+Page.SIZE);
 		Page page=getPage(id);
