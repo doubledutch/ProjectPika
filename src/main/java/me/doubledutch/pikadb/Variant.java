@@ -3,11 +3,13 @@ package me.doubledutch.pikadb;
 import java.io.*;
 
 public abstract class Variant{
+	public final static int STOP=0;
 	public final static int INTEGER=1;
 	public final static int FLOAT=2;
 
 	public abstract int getOID();
 	public abstract int getType();
+	public abstract int getSize();
 	public abstract Object getObjectValue();
 	public abstract byte[] toByteArray() throws IOException;
 	public abstract void writeVariant(DataOutput out) throws IOException;
@@ -24,6 +26,9 @@ public abstract class Variant{
 
 	public static Variant readVariant(DataInput in) throws IOException{
 		byte type=in.readByte();
+		if(type==STOP){
+			return null;
+		}
 		int oid=in.readInt();
 		switch(type){
 			case INTEGER:return Variant.Integer.readValue(oid,in);
@@ -39,6 +44,10 @@ public abstract class Variant{
 		public Integer(int oid,int value){
 			this.oid=oid;
 			this.value=value;
+		}
+
+		public int getSize(){
+			return 1+4+4;
 		}
 
 		public int getOID(){
@@ -88,6 +97,10 @@ public abstract class Variant{
 
 		public int getOID(){
 			return oid;
+		}
+
+		public int getSize(){
+			return 1+4+4;
 		}
 
 		public int getType(){

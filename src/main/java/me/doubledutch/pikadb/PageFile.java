@@ -15,6 +15,9 @@ public class PageFile{
 	}
 
 	public Page getPage(int id) throws IOException{
+		if(pageList.size()>id){
+			return pageList.get(id);
+		}
 		Page page=new Page(id,id*Page.SIZE,pageFile);
 		pageList.add(page);
 		return page;
@@ -25,9 +28,13 @@ public class PageFile{
 	}
 
 	public Page createPage() throws IOException{
+		System.out.println("Create page");
 		int id=getPageCount();
 		pageFile.setLength(pageFile.length()+Page.SIZE);
-		return getPage(id);
+		Page page=getPage(id);
+		page.setNextPageId(-1);
+		page.saveMetaData();
+		return page;
 	}
 
 	public void saveChanges() throws IOException{
