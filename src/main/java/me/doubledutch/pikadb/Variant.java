@@ -9,6 +9,7 @@ public abstract class Variant{
 	public abstract int getOID();
 	public abstract int getType();
 	public abstract Object getObjectValue();
+	public abstract byte[] toByteArray() throws IOException;
 	public abstract void writeVariant(DataOutput out) throws IOException;
 
 	public static Variant createVariant(int oid,Object obj){
@@ -62,6 +63,15 @@ public abstract class Variant{
 			out.writeInt(value);
 		}
 
+		public byte[] toByteArray() throws IOException{
+			ByteArrayOutputStream data=new ByteArrayOutputStream();
+			DataOutputStream out=new DataOutputStream(data);
+			writeVariant(out);
+			out.flush();
+			out.close();
+			return data.toByteArray();
+		}
+
 		public static Variant.Integer readValue(int oid,DataInput in) throws IOException{
 			return new Variant.Integer(oid,in.readInt());
 		}
@@ -96,6 +106,15 @@ public abstract class Variant{
 			out.writeByte(FLOAT);
 			out.writeInt(oid);
 			out.writeFloat(value);
+		}
+
+		public byte[] toByteArray() throws IOException{
+			ByteArrayOutputStream data=new ByteArrayOutputStream();
+			DataOutputStream out=new DataOutputStream(data);
+			writeVariant(out);
+			out.flush();
+			out.close();
+			return data.toByteArray();
 		}
 
 		public static Variant.Float readValue(int oid,DataInput in) throws IOException{

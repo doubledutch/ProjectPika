@@ -1,5 +1,6 @@
 package me.doubledutch.pikadb;
 
+import java.util.*;
 import java.io.*;
 
 public class Page{
@@ -9,6 +10,10 @@ public class Page{
 	private long offset;
 	private RandomAccessFile pageFile;
 	private byte[] rawData;
+
+	private int currentFill=0;
+
+	private List<PageDiff> diffList=new LinkedList<PageDiff>();
 
 	public Page(int id,long offset,RandomAccessFile pageFile) throws IOException{
 		this.id=id;
@@ -21,7 +26,23 @@ public class Page{
 	}
 
 	public void saveChanges() throws IOException{
-		pageFile.seek(offset);
-		pageFile.write(rawData);
+		System.out.println("Page.SaveChanges");
+		for(PageDiff diff:diffList){
+			pageFile.seek(offset+diff.getOffset());
+			pageFile.write(diff.getData());
+		}
+	}
+
+	public DataInput getDataInput() throws IOException{
+		return new DataInputStream(new ByteArrayInputStream(rawData));
+	}
+
+	public void addDiff(int offset,byte[] data){
+		diffList.add(new PageDiff(offset,data));
+	}
+
+	public void appendData(byte[] data){
+		diffList.add(new PageDiff(currentFill,data));
+		currentFill+=data.length;
 	}
 }

@@ -16,6 +16,7 @@ public class PageFile{
 
 	public Page getPage(int id) throws IOException{
 		Page page=new Page(id,id*Page.SIZE,pageFile);
+		pageList.add(page);
 		return page;
 	}
 
@@ -33,5 +34,10 @@ public class PageFile{
 		for(Page page:pageList){
 			page.saveChanges();
 		}
+		pageFileChannel.force(true);
+	}
+
+	public void close() throws IOException{
+		pageFile.close();
 	}
 }
