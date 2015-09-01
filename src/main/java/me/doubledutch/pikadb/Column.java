@@ -34,7 +34,7 @@ public class Column{
 
 	private List<Variant> scan(Page page) throws IOException{
 		// System.out.println("scan("+page.getId()+")");
-		List<Variant> list=new LinkedList<Variant>();
+		List<Variant> list=new ArrayList<Variant>();
 		DataInput in=page.getDataInput();
 		Variant v=Variant.readVariant(in);
 		while(v!=null){
@@ -45,7 +45,7 @@ public class Column{
 	}
 
 	public List<Variant> scan() throws IOException{
-		List<Variant> list=new LinkedList<Variant>();
+		List<Variant> list=new ArrayList<Variant>();
 		Page page=pageFile.getPage(rootId);
 		while(page!=null){
 			list.addAll(scan(page));

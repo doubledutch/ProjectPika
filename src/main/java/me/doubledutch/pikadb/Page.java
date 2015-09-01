@@ -16,6 +16,8 @@ public class Page{
 	private int currentFill=0;
 	private int nextPageId=-1;
 
+	private boolean dirty=false;
+
 	private List<PageDiff> diffList=new LinkedList<PageDiff>();
 
 	public Page(int id,long offset,RandomAccessFile pageFile) throws IOException{
@@ -58,12 +60,16 @@ public class Page{
 	}
 
 	public void saveChanges() throws IOException{
+		if(!dirty){
+			return;
+		}
 		// System.out.println("Page.SaveChanges");
 		for(PageDiff diff:diffList){
 			pageFile.seek(offset+HEADER+diff.getOffset());
 			pageFile.write(diff.getData());
 		}
 		saveMetaData();
+		dirty=false;
 	}
 
 	public DataInput getDataInput() throws IOException{
@@ -72,11 +78,13 @@ public class Page{
 
 	public void addDiff(int offset,byte[] data){
 		diffList.add(new PageDiff(offset,data));
+		dirty=true;
 	}
 
 	public void appendData(byte[] data){
 		diffList.add(new PageDiff(currentFill,data));
 		currentFill+=data.length;
+		dirty=true;
 		// System.out.println("currentFill: "+id+" "+currentFill+" "+data.length);
 	}
 }
