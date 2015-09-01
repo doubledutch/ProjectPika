@@ -59,9 +59,13 @@ public class Soup{
 	}
 
 	public List<JSONObject> scan() throws IOException,JSONException{
+		return scan(columnMap.keySet());
+	}
+
+	public List<JSONObject> scan(Collection<String> columns) throws IOException,JSONException{
 		Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
 		List<JSONObject> result=new ArrayList<JSONObject>();
-		for(String columnName:columnMap.keySet()){
+		for(String columnName:columns){
 			Column col=columnMap.get(columnName);
 			List<Variant> list=col.scan();
 			for(Variant v:list){

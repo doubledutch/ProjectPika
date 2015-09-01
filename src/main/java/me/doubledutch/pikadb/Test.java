@@ -7,7 +7,7 @@ import org.json.*;
 public class Test{
 	public static void main(String args[]){
 		String filename="./test.data";
-		int RECORDS=10000;
+		int RECORDS=50000;
 		try{
 			
 			System.out.println("Running test "+RECORDS);
@@ -40,7 +40,7 @@ public class Test{
 			f=new PageFile(filename);
 			soup=new Soup("users",f,0);
 
-			System.out.println("Ready to scan");
+			System.out.println("Scanning full objects");
 
 			List<JSONObject> list=soup.scan();
 			System.out.println("Records returned by scan "+list.size());
@@ -50,8 +50,22 @@ public class Test{
 			f.close();
 			post=System.currentTimeMillis();
 			System.out.println(" Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
-			 
 			
+			pre=System.currentTimeMillis();
+			f=new PageFile(filename);
+			soup=new Soup("users",f,0);
+			System.out.println("Scanning partial objects");
+			List<String> columns=new ArrayList<String>();
+			columns.add("id");
+			columns.add("username");
+			list=soup.scan(columns);
+			for(int i=0;i<RECORDS;i++){
+				JSONObject obj=list.get(i);
+			}
+			f.close();
+			post=System.currentTimeMillis();
+			System.out.println(" Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
+		
 		}catch(Exception e){
 			e.printStackTrace();
 		}
