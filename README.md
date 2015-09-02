@@ -52,3 +52,4 @@ foo.2
 ````
 
 However, since the purpose of columns in Pika is to hold simple values, this breaks down once we have an array holding objects. One way to fix this, could be to add a simple value type that is an object reference. In that way, the inner objects in an array could be stored as any other object in the columns.... this however, could have some serious performance implications when we are trying to read objects back from the columns - but that's something we will get to later :-)
+

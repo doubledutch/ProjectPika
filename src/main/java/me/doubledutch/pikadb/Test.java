@@ -7,7 +7,7 @@ import org.json.*;
 public class Test{
 	public static void main(String args[]){
 		String filename="./test.data";
-		int RECORDS=50000;
+		int RECORDS=100000;
 		try{
 			
 			System.out.println("Running test "+RECORDS);
@@ -24,6 +24,8 @@ public class Test{
 				obj.put("username","kasper.jeppesen"+i);
 				obj.put("firstName","Kasper");
 				obj.put("lastName","Jeppesen");
+				obj.put("image","jerk-"+i+".png");
+				// obj.put("number",3.1415f);
 				soup.add(i,obj);
 			}
 			f.saveChanges();
