@@ -6,10 +6,12 @@ import java.io.*;
 public class Column{
 	private PageFile pageFile;
 	private int rootId;
+	private int knownFreePageId;
 
 	public Column(PageFile pageFile,int rootId){
 		this.pageFile=pageFile;
 		this.rootId=rootId;
+		knownFreePageId=rootId;
 	}
 
 	public void append(Variant v) throws IOException{
@@ -18,7 +20,7 @@ public class Column{
 	}
 
 	private Page getFirstFit(int size) throws IOException{
-		Page page=pageFile.getPage(rootId);
+		Page page=pageFile.getPage(knownFreePageId);
 		while(page.getFreeSpace()<size){
 			int nextPageId=page.getNextPageId();
 			if(nextPageId==-1){
@@ -29,6 +31,7 @@ public class Column{
 				page=pageFile.getPage(nextPageId);
 			}
 		}
+		knownFreePageId=page.getId();
 		return page;
 	}
 

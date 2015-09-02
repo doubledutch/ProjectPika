@@ -42,9 +42,26 @@ public class Test{
 			f=new PageFile(filename);
 			soup=new Soup("users",f,0);
 
-			System.out.println("Scanning full objects");
+			
+			
+			System.out.println("Scanning partial objects");
+			List<String> columns=new ArrayList<String>();
+			columns.add("id");
+			columns.add("username");
+			List<JSONObject> list=soup.scan(columns);
+			for(int i=0;i<RECORDS;i++){
+				JSONObject obj=list.get(i);
+			}
+			f.close();
+			post=System.currentTimeMillis();
+			System.out.println(" Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
+		
 
-			List<JSONObject> list=soup.scan();
+			System.out.println("Scanning full objects");
+			pre=System.currentTimeMillis();
+			f=new PageFile(filename);
+			soup=new Soup("users",f,0);
+			list=soup.scan();
 			System.out.println("Records returned by scan "+list.size());
 			for(int i=0;i<RECORDS;i++){
 				JSONObject obj=list.get(i);
@@ -53,11 +70,11 @@ public class Test{
 			post=System.currentTimeMillis();
 			System.out.println(" Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
 			
+			System.out.println("Scanning partial objects");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
 			soup=new Soup("users",f,0);
-			System.out.println("Scanning partial objects");
-			List<String> columns=new ArrayList<String>();
+			columns=new ArrayList<String>();
 			columns.add("id");
 			columns.add("username");
 			list=soup.scan(columns);
@@ -68,6 +85,19 @@ public class Test{
 			post=System.currentTimeMillis();
 			System.out.println(" Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
 		
+			System.out.println("Scanning full objects");
+			pre=System.currentTimeMillis();
+			f=new PageFile(filename);
+			soup=new Soup("users",f,0);
+			list=soup.scan();
+			System.out.println("Records returned by scan "+list.size());
+			for(int i=0;i<RECORDS;i++){
+				JSONObject obj=list.get(i);
+			}
+			f.close();
+			post=System.currentTimeMillis();
+			System.out.println(" Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
+			
 		}catch(Exception e){
 			e.printStackTrace();
 		}
