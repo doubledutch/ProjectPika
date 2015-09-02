@@ -64,6 +64,8 @@ public class Page{
 			return;
 		}
 		// System.out.println("Page.SaveChanges");
+		
+		
 		for(PageDiff diff:diffList){
 			pageFile.seek(offset+HEADER+diff.getOffset());
 			pageFile.write(diff.getData());

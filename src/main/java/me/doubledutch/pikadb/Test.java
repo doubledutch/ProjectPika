@@ -98,6 +98,28 @@ public class Test{
 			post=System.currentTimeMillis();
 			System.out.println(" Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
 			
+			System.out.println("Scanning partial objects 50%");
+			pre=System.currentTimeMillis();
+			f=new PageFile(filename);
+			soup=new Soup("users",f,0);
+			columns=new ArrayList<String>();
+			columns.add("id");
+			columns.add("username");
+			Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
+			for(int i=0;i<RECORDS;i++){
+				if(i%2==0){
+					JSONObject obj=new JSONObject();
+					objMap.put(i,obj);
+				}
+			}
+			list=soup.scan(objMap,columns);
+			for(int i=0;i<list.size();i++){
+				JSONObject obj=list.get(i);
+			}
+			f.close();
+			post=System.currentTimeMillis();
+			System.out.println(" Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
+		
 		}catch(Exception e){
 			e.printStackTrace();
 		}

@@ -81,4 +81,24 @@ public class Soup{
 		}
 		return result;
 	}
+
+	public List<JSONObject> scan(Map<Integer,JSONObject> objMap,Collection<String> columns) throws IOException,JSONException{
+		// Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
+		List<JSONObject> result=new ArrayList<JSONObject>();
+		for(JSONObject obj:objMap.values()){
+			result.add(obj);
+		}
+		for(String columnName:columns){
+			Column col=columnMap.get(columnName);
+			List<Variant> list=col.scan();
+			for(Variant v:list){
+				int oid=v.getOID();
+				if(objMap.containsKey(oid)){
+					JSONObject obj=objMap.get(oid);
+					obj.put(columnName,v.getObjectValue());
+				}
+			}
+		}
+		return result;
+	}
 }
