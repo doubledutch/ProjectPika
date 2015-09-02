@@ -25,7 +25,7 @@ public class Test{
 				obj.put("firstName","Kasper");
 				obj.put("lastName","Jeppesen");
 				obj.put("image","jerk-"+i+".png");
-				// obj.put("number",3.1415f);
+				obj.put("number",3.1415f);
 				soup.add(i,obj);
 			}
 			f.saveChanges();

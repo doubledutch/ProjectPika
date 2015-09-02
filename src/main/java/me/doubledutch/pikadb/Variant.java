@@ -7,6 +7,7 @@ public abstract class Variant{
 	public final static int INTEGER=1;
 	public final static int FLOAT=2;
 	public final static int STRING=3;
+	public final static int DOUBLE=4;
 
 	public abstract int getOID();
 	public abstract int getType();
@@ -21,6 +22,9 @@ public abstract class Variant{
 		}
 		if(obj instanceof java.lang.Float){
 			return new Variant.Float(oid,(java.lang.Float)obj);
+		}
+		if(obj instanceof java.lang.Double){
+			return new Variant.Double(oid,(java.lang.Double)obj);
 		}
 		if(obj instanceof java.lang.String){
 			return new Variant.String(oid,(java.lang.String)obj);
@@ -37,6 +41,7 @@ public abstract class Variant{
 		switch(type){
 			case INTEGER:return Variant.Integer.readValue(oid,in);
 			case FLOAT:return Variant.Float.readValue(oid,in);
+			case DOUBLE:return Variant.Double.readValue(oid,in);
 			case STRING:return Variant.String.readValue(oid,in);
 		}
 		return null;
@@ -137,6 +142,55 @@ public abstract class Variant{
 
 		public static Variant.Float readValue(int oid,DataInput in) throws IOException{
 			return new Variant.Float(oid,in.readFloat());
+		}
+	}
+
+	public static class Double extends Variant{
+		private int oid;
+		private double value;
+
+		public Double(int oid,double value){
+			this.oid=oid;
+			this.value=value;
+		}
+
+		public int getOID(){
+			return oid;
+		}
+
+		public int getSize(){
+			return 1+4+8;
+		}
+
+		public int getType(){
+			return DOUBLE;
+		}
+
+		public Object getObjectValue(){
+			return value;
+		}
+
+		public double getValue(){
+			return value;
+		}
+
+		public void writeVariant(DataOutput out) throws IOException{
+			out.writeByte(DOUBLE);
+			out.writeInt(oid);
+			out.writeDouble(value);
+		}
+
+		public byte[] toByteArray() throws IOException{
+			ByteArrayOutputStream data=new ByteArrayOutputStream();
+			DataOutputStream out=new DataOutputStream(data);
+			writeVariant(out);
+			out.flush();
+			out.close();
+			return data.toByteArray();
+		}
+
+		public static Variant.Double readValue(int oid,DataInput in) throws IOException{
+			return new Variant.Double(oid,in.readDouble());
 		}
 	}
 
