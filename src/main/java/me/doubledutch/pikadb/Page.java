@@ -64,12 +64,22 @@ public class Page{
 			return;
 		}
 		// System.out.println("Page.SaveChanges");
-		
-		
+		for(PageDiff diff:diffList){
+			System.arraycopy(diff.getData(),
+                        	0,
+                             rawData,
+                             diff.getOffset(),
+                             diff.getData().length);
+		}
+		pageFile.seek(offset+HEADER);
+		pageFile.write(rawData);
+		/*
+		Old diff by diff save
 		for(PageDiff diff:diffList){
 			pageFile.seek(offset+HEADER+diff.getOffset());
 			pageFile.write(diff.getData());
 		}
+		*/
 		saveMetaData();
 		dirty=false;
 	}
