@@ -26,13 +26,17 @@ public class Soup{
 		while(list.size()>index){
 			Variant.String name=(Variant.String)list.get(index++);
 			Variant.Integer pageId=(Variant.Integer)list.get(index++);
+			// System.out.println("Found column "+name.getValue()+" at "+pageId.getValue());
 			Column col=new Column(pageFile,pageId.getValue());
 			tmp.put(name.getValue(),col);
 		}
 		columnMap=tmp;
 	}
 
-	private Column getColumn(String name){
+	private Column getColumn(String name) throws IOException{
+		if(!columnMap.containsKey(name)){
+			return createColumn(name);
+		}
 		return columnMap.get(name);
 	}
 
@@ -48,9 +52,6 @@ public class Soup{
 
 	public void add(int oid,JSONObject obj) throws IOException,JSONException{
 		for(String key:JSONObject.getNames(obj)){
-			if(!columnMap.containsKey(key)){
-				createColumn(key);
-			}
 			Column col=getColumn(key);
 			Object value=obj.get(key);
 			Variant variant=Variant.createVariant(oid,value);
@@ -66,7 +67,9 @@ public class Soup{
 		Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
 		List<JSONObject> result=new ArrayList<JSONObject>();
 		for(String columnName:columns){
-			Column col=columnMap.get(columnName);
+
+			Column col=getColumn(columnName);
+			// System.out.println("Scanning column "+columnName+" at "+col.rootId);
 			List<Variant> list=col.scan();
 			for(Variant v:list){
 				int oid=v.getOID();
@@ -80,6 +83,14 @@ public class Soup{
 			}
 		}
 		return result;
+	}
+
+	public JSONObject scan(int oid,Collection<String> columns)  throws IOException,JSONException{
+		JSONObject obj=new JSONObject();
+		Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
+		objMap.put(oid,obj);
+		scan(objMap,columns);
+		return obj;
 	}
 
 	public List<JSONObject> scan(Map<Integer,JSONObject> objMap,Collection<String> columns) throws IOException,JSONException{

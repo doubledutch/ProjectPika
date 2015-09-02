@@ -4,9 +4,9 @@ import java.util.*;
 import java.io.*;
 
 public class Page{
-	public static int HEADER=4+4;
-	public static int PAYLOAD=8192-HEADER-1;
-	public static int SIZE=PAYLOAD+HEADER+1;
+	public final static int HEADER=4+4;
+	public final static int PAYLOAD=8192-HEADER-1;
+	public final static int SIZE=PAYLOAD+HEADER+1;
 	// TODO: add stop byte after data payload when creating and updating the file
 
 	private int id;
@@ -29,6 +29,7 @@ public class Page{
 		rawData=new byte[PAYLOAD];
 		pageFile.seek(offset+HEADER);
 		pageFile.readFully(rawData);
+		// System.out.println("Page opened: "+id+" nextPageId: "+nextPageId+" currentFill: "+currentFill);
 	}
 
 	public void saveMetaData() throws IOException{

@@ -5,7 +5,7 @@ import java.nio.channels.*;
 import java.util.*;
 
 public class PageFile{
-	private List<Page> pageList=new ArrayList<Page>();
+	private Map<Integer,Page> pageMap=new HashMap<Integer,Page>();
 	private RandomAccessFile pageFile;
 	private FileChannel pageFileChannel;
 
@@ -15,11 +15,11 @@ public class PageFile{
 	}
 
 	public Page getPage(int id) throws IOException{
-		if(pageList.size()>id){
-			return pageList.get(id);
+		if(pageMap.containsKey(id)){
+			return pageMap.get(id);
 		}
 		Page page=new Page(id,id*Page.SIZE,pageFile);
-		pageList.add(page);
+		pageMap.put(id,page);
 		return page;
 	}
 
@@ -28,17 +28,19 @@ public class PageFile{
 	}
 
 	public Page createPage() throws IOException{
-		// System.out.println("Create page");
 		int id=getPageCount();
+		// System.out.println("Create page "+id);
 		pageFile.setLength(pageFile.length()+Page.SIZE);
 		Page page=getPage(id);
 		page.setNextPageId(-1);
 		page.saveMetaData();
-		return page;
+		// page.saveChanges();
+		pageFileChannel.force(true);
+		return getPage(id);
 	}
 
 	public void saveChanges() throws IOException{
-		for(Page page:pageList){
+		for(Page page:pageMap.values()){
 			page.saveChanges();
 		}
 		pageFileChannel.force(true);

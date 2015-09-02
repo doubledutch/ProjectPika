@@ -58,3 +58,8 @@ However, since the purpose of columns in Pika is to hold simple values, this bre
 ### Column.java:knownFreePageId
 
 Currently we could leave big gaps in pages when looking for first fit for a large object.... improve!
+
+### Page.java:saveChanges
+
+Make the right choice between flushing full pages and writing individual diffs... profile and choose!
+

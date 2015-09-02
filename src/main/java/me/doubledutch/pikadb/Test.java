@@ -40,7 +40,7 @@ public class Test{
 
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);
+			soup=new Soup("users",f,p1.getId());
 
 			
 			
@@ -60,7 +60,7 @@ public class Test{
 			System.out.println("Scanning full objects");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);
+			soup=new Soup("users",f,p1.getId());
 			list=soup.scan();
 			System.out.println("Records returned by scan "+list.size());
 			for(int i=0;i<RECORDS;i++){
@@ -73,7 +73,7 @@ public class Test{
 			System.out.println("Scanning partial objects");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);
+			soup=new Soup("users",f,p1.getId());
 			columns=new ArrayList<String>();
 			columns.add("id");
 			columns.add("username");
@@ -88,11 +88,12 @@ public class Test{
 			System.out.println("Scanning full objects");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);
+			soup=new Soup("users",f,p1.getId());
 			list=soup.scan();
 			System.out.println("Records returned by scan "+list.size());
 			for(int i=0;i<RECORDS;i++){
 				JSONObject obj=list.get(i);
+				// System.out.println(obj.toString());
 			}
 			f.close();
 			post=System.currentTimeMillis();
@@ -101,7 +102,7 @@ public class Test{
 			System.out.println("Scanning partial objects 50%");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);
+			soup=new Soup("users",f,p1.getId());
 			columns=new ArrayList<String>();
 			columns.add("id");
 			columns.add("username");
@@ -115,11 +116,21 @@ public class Test{
 			list=soup.scan(objMap,columns);
 			for(int i=0;i<list.size();i++){
 				JSONObject obj=list.get(i);
+				// System.out.println(obj.toString());
 			}
 			f.close();
 			post=System.currentTimeMillis();
 			System.out.println(" Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
 		
+			System.out.println("Picking out single object");
+			pre=System.currentTimeMillis();
+			f=new PageFile(filename);
+			soup=new Soup("users",f,p1.getId());
+			System.out.println(soup.scan(6,columns).toString());
+			f.close();
+			post=System.currentTimeMillis();
+			System.out.println(" Read in "+(post-pre)+"ms");
+
 		}catch(Exception e){
 			e.printStackTrace();
 		}

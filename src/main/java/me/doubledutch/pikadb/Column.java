@@ -5,7 +5,7 @@ import java.io.*;
 
 public class Column{
 	private PageFile pageFile;
-	private int rootId;
+	public int rootId;
 	private int knownFreePageId;
 
 	public Column(PageFile pageFile,int rootId){
@@ -25,6 +25,7 @@ public class Column{
 			int nextPageId=page.getNextPageId();
 			if(nextPageId==-1){
 				Page next=pageFile.createPage();
+				// System.out.println("next: "+next.getId());
 				page.setNextPageId(next.getId());
 				page=next;
 			}else{
@@ -48,8 +49,10 @@ public class Column{
 	}
 
 	public List<Variant> scan() throws IOException{
+		// System.out.println("starting col scan at "+rootId);
 		List<Variant> list=new ArrayList<Variant>();
 		Page page=pageFile.getPage(rootId);
+		// System.out.println("Got page "+page.getId());
 		while(page!=null){
 			list.addAll(scan(page));
 			int next=page.getNextPageId();
