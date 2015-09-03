@@ -93,6 +93,10 @@ public class Soup{
 		return obj;
 	}
 
+	public List<JSONObject> scan(Map<Integer,JSONObject> objMap) throws IOException,JSONException{
+		return scan(objMap,columnMap.keySet());
+	}
+
 	public List<JSONObject> scan(Map<Integer,JSONObject> objMap,Collection<String> columns) throws IOException,JSONException{
 		// Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
 		List<JSONObject> result=new ArrayList<JSONObject>();

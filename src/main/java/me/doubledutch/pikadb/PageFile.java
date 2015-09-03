@@ -29,7 +29,7 @@ public class PageFile{
 
 	public Page createPage() throws IOException{
 		int id=getPageCount();
-		// System.out.println("Create page "+id);
+		// System.out.println("Create page "+id + " at "+pageFile.length());
 		pageFile.setLength(pageFile.length()+Page.SIZE);
 		Page page=getPage(id);
 		page.setNextPageId(-1);

@@ -5,8 +5,8 @@ import java.io.*;
 
 public class Page{
 	public final static int HEADER=4+4;
-	public final static int PAYLOAD=8192-HEADER-1;
-	public final static int SIZE=PAYLOAD+HEADER+1;
+	public final static int PAYLOAD=8192-HEADER-2;
+	public final static int SIZE=PAYLOAD+HEADER+2;
 	// TODO: add stop byte after data payload when creating and updating the file
 
 	private int id;
