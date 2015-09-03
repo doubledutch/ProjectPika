@@ -85,6 +85,14 @@ public class Soup{
 		return result;
 	}
 
+	public JSONObject scan(int oid)  throws IOException,JSONException{
+		JSONObject obj=new JSONObject();
+		Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
+		objMap.put(oid,obj);
+		scan(objMap);
+		return obj;
+	}
+
 	public JSONObject scan(int oid,Collection<String> columns)  throws IOException,JSONException{
 		JSONObject obj=new JSONObject();
 		Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();

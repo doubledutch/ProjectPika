@@ -157,7 +157,8 @@ public class Test{
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
 			soup=new Soup("users",f,p1.getId());
-			soup.scan(RECORDS/2,columns);
+			JSONObject obj=soup.scan(RECORDS/2);
+			System.out.println(obj.toString());
 			f.close();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms");
