@@ -8,7 +8,8 @@ public abstract class Variant{
 	public final static int FLOAT=2;
 	public final static int STRING=3;
 	public final static int DOUBLE=4;
-	public final static int DELETE=5;
+	public final static int BOOLEAN=5;
+	public final static int DELETE=6;
 
 	public abstract int getOID();
 	public abstract int getType();
@@ -48,6 +49,9 @@ public abstract class Variant{
 		if(obj instanceof java.lang.String){
 			return new Variant.String(oid,(java.lang.String)obj);
 		}
+		if(obj instanceof java.lang.Boolean){
+			return new Variant.Boolean(oid,(java.lang.Boolean)obj);
+		}
 		return null;
 	}
 
@@ -65,6 +69,7 @@ public abstract class Variant{
 			case FLOAT:return Variant.Float.readValue(oid,in);
 			case DOUBLE:return Variant.Double.readValue(oid,in);
 			case STRING:return Variant.String.readValue(oid,in);
+			case BOOLEAN:return Variant.Boolean.readValue(oid,in);
 		}
 		return null;
 	}
@@ -115,6 +120,55 @@ public abstract class Variant{
 
 		public static Variant.Integer readValue(int oid,DataInput in) throws IOException{
 			return new Variant.Integer(oid,in.readInt());
+		}
+	}
+
+	public static class Boolean extends Variant{
+		private int oid;
+		private boolean value;
+
+		public Boolean(int oid,boolean value){
+			this.oid=oid;
+			this.value=value;
+		}
+
+		public int getSize(){
+			return 1+4+1;
+		}
+
+		public int getOID(){
+			return oid;
+		}
+
+		public int getType(){
+			return BOOLEAN;
+		}
+
+		public Object getObjectValue(){
+			return value;
+		}
+
+		public boolean getValue(){
+			return value;
+		}
+
+		public void writeVariant(DataOutput out) throws IOException{
+			out.writeByte(BOOLEAN);
+			out.writeInt(oid);
+			out.writeBoolean(value);
+		}
+
+		public byte[] toByteArray() throws IOException{
+			ByteArrayOutputStream data=new ByteArrayOutputStream();
+			DataOutputStream out=new DataOutputStream(data);
+			writeVariant(out);
+			out.flush();
+			out.close();
+			return data.toByteArray();
+		}
+
+		public static Variant.Boolean readValue(int oid,DataInput in) throws IOException{
+			return new Variant.Boolean(oid,in.readBoolean());
 		}
 	}
 

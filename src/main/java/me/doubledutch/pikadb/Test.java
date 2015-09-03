@@ -164,6 +164,7 @@ public class Test{
 			JSONObject objUpdate=new JSONObject();
 			objUpdate.put("firstName","Jason");
 			objUpdate.put("background","#FFB807");
+			objUpdate.put("SoMuchBoolean",false);
 
 			soup.update(45001,objUpdate);
 			f.saveChanges();
