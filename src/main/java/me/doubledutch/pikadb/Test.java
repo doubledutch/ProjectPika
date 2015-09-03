@@ -79,7 +79,7 @@ public class Test{
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
 		
 			System.gc();
-
+			/*
 			System.out.println(" + Reading 50% of all objects");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
@@ -150,7 +150,7 @@ public class Test{
 			f=null;
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/2)/((post-pre)/1000.0))+" obj/s");
-		
+			*/
 
 			System.gc();
 			System.out.println(" + Reading a single object");
