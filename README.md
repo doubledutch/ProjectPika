@@ -63,3 +63,7 @@ Currently we could leave big gaps in pages when looking for first fit for a larg
 
 Make the right choice between flushing full pages and writing individual diffs... profile and choose!
 
+### Variant.java:getSize
+
+Due to the way we implemented DELETE markers in pages, the size of variants can't be trusted to calculate offsets.
+

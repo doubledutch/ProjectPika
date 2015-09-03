@@ -8,6 +8,7 @@ public abstract class Variant{
 	public final static int FLOAT=2;
 	public final static int STRING=3;
 	public final static int DOUBLE=4;
+	public final static int DELETE=5;
 
 	public abstract int getOID();
 	public abstract int getType();
@@ -15,6 +16,24 @@ public abstract class Variant{
 	public abstract Object getObjectValue();
 	public abstract byte[] toByteArray() throws IOException;
 	public abstract void writeVariant(DataOutput out) throws IOException;
+
+	public static void deleteValues(int deleteOid,Page page) throws IOException{
+		DataInput in=page.getDataInput();
+		int offset=0;
+		Variant v=readVariant(in);
+		while(v!=null){
+			// Read values
+			if(v.getOID()==deleteOid){
+				byte[] deleteData=new byte[v.getSize()];
+				for(int i=0;i<deleteData.length;i++){
+					deleteData[i]=DELETE;
+				}
+				page.addDiff(offset,deleteData);
+			}
+			offset+=v.getSize();
+			v=readVariant(in);
+		}
+	}
 
 	public static Variant createVariant(int oid,Object obj){
 		if(obj instanceof java.lang.Integer){
@@ -34,6 +53,9 @@ public abstract class Variant{
 
 	public static Variant readVariant(DataInput in) throws IOException{
 		byte type=in.readByte();
+		while(type==DELETE){
+			type=in.readByte();
+		}
 		if(type==STOP){
 			return null;
 		}

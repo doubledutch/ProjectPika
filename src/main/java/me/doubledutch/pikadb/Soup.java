@@ -50,6 +50,16 @@ public class Soup{
 		return col;
 	}
 
+	public void update(int oid,JSONObject obj) throws IOException,JSONException{
+		for(String key:JSONObject.getNames(obj)){
+			Column col=getColumn(key);
+			Object value=obj.get(key);
+			Variant variant=Variant.createVariant(oid,value);
+			col.delete(oid);
+			// col.append(variant);
+		}
+	}
+
 	public void add(int oid,JSONObject obj) throws IOException,JSONException{
 		for(String key:JSONObject.getNames(obj)){
 			Column col=getColumn(key);

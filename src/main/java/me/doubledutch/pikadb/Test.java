@@ -157,8 +157,20 @@ public class Test{
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
 			soup=new Soup("users",f,p1.getId());
-			JSONObject obj=soup.scan(RECORDS/2);
+
+			JSONObject obj=soup.scan(45001);
 			System.out.println(obj.toString());
+
+			JSONObject objUpdate=new JSONObject();
+			objUpdate.put("firstName","Jason");
+			objUpdate.put("background","#FFB807");
+
+			soup.update(45001,objUpdate);
+			f.saveChanges();
+
+			obj=soup.scan(45001);
+			System.out.println(obj.toString());
+
 			f.close();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms");

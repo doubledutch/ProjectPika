@@ -14,6 +14,21 @@ public class Column{
 		knownFreePageId=rootId;
 	}
 
+	public void delete(int oid) throws IOException{
+		Page page=pageFile.getPage(rootId);
+		while(page!=null){
+			// Delete values
+			Variant.deleteValues(oid,page);
+			// Find next page
+			int nextPageId=page.getNextPageId();
+			if(nextPageId==-1){
+				page=null;
+			}else{
+				page=pageFile.getPage(nextPageId);
+			}
+		}
+	}
+
 	public void append(Variant v) throws IOException{
 		Page page=getFirstFit(v.getSize());
 		page.appendData(v.toByteArray());
