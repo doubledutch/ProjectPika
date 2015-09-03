@@ -44,6 +44,10 @@ public class Page{
 		currentFill=pageFile.readInt();
 	}
 
+	public int getCurrentFill(){
+		return currentFill;
+	}
+
 	public int getNextPageId(){
 		return nextPageId;
 	}
@@ -58,6 +62,16 @@ public class Page{
 
 	public int getFreeSpace(){
 		return PAYLOAD-currentFill;
+	}
+
+	public void commitChanges(WriteAheadLog wal) throws IOException{
+		if(!dirty){
+			return;
+		}
+		for(PageDiff diff:diffList){
+			wal.addPageDiff(getId(),diff);
+		}
+		wal.addMetaData(getId(),getNextPageId(),getCurrentFill());
 	}
 
 	public void saveChanges() throws IOException{

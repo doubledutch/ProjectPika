@@ -8,10 +8,24 @@ public class PageFile{
 	private Map<Integer,Page> pageMap=new HashMap<Integer,Page>();
 	private RandomAccessFile pageFile;
 	private FileChannel pageFileChannel;
+	private String filename;
+	private WriteAheadLog wal=null;
 
 	public PageFile(String filename) throws IOException{
+		this.filename=filename;
 		pageFile=new RandomAccessFile(filename,"rw");
 		pageFileChannel=pageFile.getChannel();
+		File ftest=new File(filename+".wal");
+		if(ftest.exists()){
+			wal=new WriteAheadLog(filename+".wal");
+			recoverTransaction();
+			ftest.delete();
+			wal=null;
+		}
+	}
+
+	private void recoverTransaction(){
+		// Replay everything in the write ahead log
 	}
 
 	public Page getPage(int id) throws IOException{
@@ -40,10 +54,21 @@ public class PageFile{
 	}
 
 	public void saveChanges() throws IOException{
+		// Write to write ahead log
+		if(wal==null){
+			wal=new WriteAheadLog(filename);
+		}
+		wal.beginTransaction();
+		for(Page page:pageMap.values()){
+			page.commitChanges(wal);
+		}
+		wal.closeTransaction();
+		// Write to page file
 		for(Page page:pageMap.values()){
 			page.saveChanges();
 		}
 		pageFileChannel.force(true);
+		wal.commitTransaction();
 	}
 
 	public void close() throws IOException{
