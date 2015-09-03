@@ -50,6 +50,12 @@ public class Soup{
 		return col;
 	}
 
+	public void delete(int oid) throws IOException{
+		for(Column col:columnMap.values()){
+			col.delete(oid);
+		}
+	}
+
 	public void update(int oid,JSONObject obj) throws IOException,JSONException{
 		for(String key:JSONObject.getNames(obj)){
 			Column col=getColumn(key);
@@ -100,6 +106,9 @@ public class Soup{
 		Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
 		objMap.put(oid,obj);
 		scan(objMap);
+		if(JSONObject.getNames(obj)==null){
+			return null;
+		}
 		return obj;
 	}
 
@@ -108,6 +117,9 @@ public class Soup{
 		Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
 		objMap.put(oid,obj);
 		scan(objMap,columns);
+		if(JSONObject.getNames(obj)==null){
+			return null;
+		}
 		return obj;
 	}
 

@@ -171,6 +171,11 @@ public class Test{
 			obj=soup.scan(45001);
 			System.out.println(obj.toString());
 
+			soup.delete(45001);
+			f.saveChanges();
+			obj=soup.scan(45001);
+			System.out.println(obj);
+
 			f.close();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms");
