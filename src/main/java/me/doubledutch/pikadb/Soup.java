@@ -56,7 +56,7 @@ public class Soup{
 			Object value=obj.get(key);
 			Variant variant=Variant.createVariant(oid,value);
 			col.delete(oid);
-			// col.append(variant);
+			col.append(variant);
 		}
 	}
 
