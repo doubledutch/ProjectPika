@@ -4,9 +4,9 @@ import java.util.*;
 import java.io.*;
 
 public class Page{
-	public final static int HEADER=4+4;
-	public final static int PAYLOAD=8192-HEADER-2;
-	public final static int SIZE=PAYLOAD+HEADER+2;
+	public final static int HEADER=4+4+4;
+	public final static int PAYLOAD=8192-HEADER-4;
+	public final static int SIZE=PAYLOAD+HEADER+4;
 	// TODO: add stop byte after data payload when creating and updating the file
 
 	private int id;
@@ -15,6 +15,7 @@ public class Page{
 	private byte[] rawData;
 	private int currentFill=0;
 	private int nextPageId=-1;
+	private int bloomfilter=0;
 
 	private boolean dirty=false;
 
@@ -36,12 +37,26 @@ public class Page{
 		pageFile.seek(offset);
 		pageFile.writeInt(nextPageId);
 		pageFile.writeInt(currentFill);
+		pageFile.writeInt(bloomfilter);
 	}
 
 	public void loadMetaData() throws IOException{
 		pageFile.seek(offset);
 		nextPageId=pageFile.readInt();
 		currentFill=pageFile.readInt();
+		bloomfilter=pageFile.readInt();
+	}
+
+	public void addToBloomFilter(int oid){
+		bloomfilter=bloomfilter | oid;
+	}
+
+	public boolean isInBloomFilter(int oid){
+		return (bloomfilter & oid) == oid;
+	}
+
+	public int getBloomFilter(){
+		return bloomfilter;
 	}
 
 	public int getCurrentFill(){

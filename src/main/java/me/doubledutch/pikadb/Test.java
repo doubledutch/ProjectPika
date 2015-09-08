@@ -41,7 +41,7 @@ public class Test{
 			List<JSONObject> list=null;
 
 
-			/*
+			
 			// Do a quick warmup scan
 			f=new PageFile(filename);
 			soup=new Soup("users",f,0);
@@ -82,7 +82,7 @@ public class Test{
 			f=null;
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
-		*/
+		
 			System.gc();
 			/*
 			System.out.println(" + Reading 50% of all objects");
@@ -204,7 +204,12 @@ public class Test{
 
 			f.close();
 			
-
+			/*
+			System.out.println("1 = "+MurmurHash3.hashInt(1337,1));
+			System.out.println("2 = "+MurmurHash3.hashInt(1337,2));
+			System.out.println("3 = "+MurmurHash3.hashInt(1337,3));
+			System.out.println("1000 = "+MurmurHash3.hashInt(1337,1000));
+			*/
 		}catch(Exception e){
 			e.printStackTrace();
 		}

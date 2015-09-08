@@ -34,6 +34,7 @@ public class Column{
 	public void append(Variant v) throws IOException{
 		Page page=getFirstFit(v.getSize());
 		page.appendData(v.toByteArray());
+		page.addToBloomFilter(v.getOID());
 	}
 
 	private Page getFirstFit(int size) throws IOException{
@@ -61,6 +62,11 @@ public class Column{
 		while(v!=null){
 			if(v.getType()!=Variant.SKIP){
 				list.add(v);
+				if(!set.isOpen()){
+					if(set.getMatchCount()==set.getCount()){
+						return list;
+					}
+				}
 			}
 			v=Variant.readVariant(in,set);
 		}
@@ -68,12 +74,22 @@ public class Column{
 	}
 
 	public List<Variant> scan(ObjectSet set) throws IOException{
+		set.resetMatchCounter();
 		// System.out.println("starting col scan at "+rootId);
 		List<Variant> list=new ArrayList<Variant>();
 		Page page=pageFile.getPage(rootId);
 		// System.out.println("Got page "+page.getId());
 		while(page!=null){
-			list.addAll(scan(page,set));
+			if((!set.isOpen()) && set.anyObjectsInBloomFilter(page.getBloomFilter())){
+				list.addAll(scan(page,set));
+			}else if(set.isOpen()){
+				list.addAll(scan(page,set));
+			}
+			if(!set.isOpen()){
+				if(set.getMatchCount()==set.getCount()){
+					return list;
+				}
+			}
 			int next=page.getNextPageId();
 			// System.out.println("next:"+next);
 			if(next>-1){
