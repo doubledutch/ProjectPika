@@ -1,6 +1,8 @@
 package me.doubledutch.pikadb;
 
 import java.io.*;
+import org.json.*;
+import java.util.*;
 
 public abstract class Variant{
 	public final static int STOP=0;
@@ -10,6 +12,9 @@ public abstract class Variant{
 	public final static int DOUBLE=4;
 	public final static int BOOLEAN=5;
 	public final static int DELETE=6;
+	public final static int SKIP=7;
+
+	public static Variant skipVariant=new Variant.Skip();
 
 	public abstract int getOID();
 	public abstract int getType();
@@ -17,14 +22,15 @@ public abstract class Variant{
 	public abstract Object getObjectValue();
 	public abstract byte[] toByteArray() throws IOException;
 	public abstract void writeVariant(DataOutput out) throws IOException;
+	// public abstract void skipValue(DataInput in) throws IOException;
 
-	public static void deleteValues(int deleteOid,Page page) throws IOException{
+	public static void deleteValues(ObjectSet set,Page page) throws IOException{
 		DataInput in=page.getDataInput();
 		int offset=0;
-		Variant v=readVariant(in);
+		Variant v=readVariant(in,set);
 		while(v!=null){
 			// Read values
-			if(v.getOID()==deleteOid){
+			if(set.contains(v.getOID())){
 				byte[] deleteData=new byte[v.getSize()];
 				for(int i=0;i<deleteData.length;i++){
 					deleteData[i]=DELETE;
@@ -32,7 +38,7 @@ public abstract class Variant{
 				page.addDiff(offset,deleteData);
 			}
 			offset+=v.getSize();
-			v=readVariant(in);
+			v=readVariant(in,set);
 		}
 	}
 
@@ -55,7 +61,7 @@ public abstract class Variant{
 		return null;
 	}
 
-	public static Variant readVariant(DataInput in) throws IOException{
+	public static Variant readVariant(DataInput in,ObjectSet set) throws IOException{
 		byte type=in.readByte();
 		while(type==DELETE){
 			type=in.readByte();
@@ -64,14 +70,66 @@ public abstract class Variant{
 			return null;
 		}
 		int oid=in.readInt();
-		switch(type){
-			case INTEGER:return Variant.Integer.readValue(oid,in);
-			case FLOAT:return Variant.Float.readValue(oid,in);
-			case DOUBLE:return Variant.Double.readValue(oid,in);
-			case STRING:return Variant.String.readValue(oid,in);
-			case BOOLEAN:return Variant.Boolean.readValue(oid,in);
+		if(set.contains(oid)){
+			switch(type){
+				case INTEGER:return Variant.Integer.readValue(oid,in);
+				case FLOAT:return Variant.Float.readValue(oid,in);
+				case DOUBLE:return Variant.Double.readValue(oid,in);
+				case STRING:return Variant.String.readValue(oid,in);
+				case BOOLEAN:return Variant.Boolean.readValue(oid,in);
+			}
+		}else{
+			switch(type){
+				case INTEGER:return Variant.Integer.skipValue(in);
+				case FLOAT:return Variant.Float.skipValue(in);
+				case DOUBLE:return Variant.Double.skipValue(in);
+				case STRING:return Variant.String.skipValue(in);
+				case BOOLEAN:return Variant.Boolean.skipValue(in);
+			}
+			return skipVariant;
 		}
 		return null;
+	}
+
+	public static class Skip extends Variant{
+		public Skip(){
+		}
+
+		public int getSize(){
+			return 0;
+		}
+
+		public int getOID(){
+			return -1;
+		}
+
+		public int getType(){
+			return SKIP;
+		}
+
+		public Object getObjectValue(){
+			return -1;
+		}
+
+		public int getValue(){
+			return -1;
+		}
+
+		public void writeVariant(DataOutput out) throws IOException{
+
+		}
+
+		public byte[] toByteArray() throws IOException{
+			return new byte[0];
+		}
+
+		public static Variant readValue(int oid,DataInput in) throws IOException{
+			return Variant.skipVariant;
+		}
+
+		public static Variant skipValue(DataInput in) throws IOException{
+			return skipVariant;
+		}
 	}
 
 	public static class Integer extends Variant{
@@ -107,6 +165,11 @@ public abstract class Variant{
 			out.writeByte(INTEGER);
 			out.writeInt(oid);
 			out.writeInt(value);
+		}
+
+		public static Variant skipValue(DataInput in) throws IOException{
+			in.skipBytes(4);
+			return skipVariant;
 		}
 
 		public byte[] toByteArray() throws IOException{
@@ -167,6 +230,11 @@ public abstract class Variant{
 			return data.toByteArray();
 		}
 
+		public static Variant skipValue(DataInput in) throws IOException{
+			in.skipBytes(1);
+			return skipVariant;
+		}
+
 		public static Variant.Boolean readValue(int oid,DataInput in) throws IOException{
 			return new Variant.Boolean(oid,in.readBoolean());
 		}
@@ -199,6 +267,11 @@ public abstract class Variant{
 
 		public float getValue(){
 			return value;
+		}
+
+		public static Variant skipValue(DataInput in) throws IOException{
+			in.skipBytes(4);
+			return skipVariant;
 		}
 
 		public void writeVariant(DataOutput out) throws IOException{
@@ -250,6 +323,11 @@ public abstract class Variant{
 			return value;
 		}
 
+		public static Variant skipValue(DataInput in) throws IOException{
+			in.skipBytes(8);
+			return skipVariant;
+		}
+
 		public void writeVariant(DataOutput out) throws IOException{
 			out.writeByte(DOUBLE);
 			out.writeInt(oid);
@@ -297,6 +375,12 @@ public abstract class Variant{
 
 		public java.lang.String getValue(){
 			return value;
+		}
+
+		public static Variant skipValue(DataInput in) throws IOException{
+			short s=in.readShort();
+			in.skipBytes(s*2);
+			return skipVariant;
 		}
 
 		public void writeVariant(DataOutput out) throws IOException{

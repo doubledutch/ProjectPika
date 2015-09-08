@@ -38,10 +38,14 @@ public class Test{
 			File ftest=new File(filename);
 			System.out.println("   - Database size : "+(ftest.length()/1024)+"kb");
 
+			List<JSONObject> list=null;
+
+
+			/*
 			// Do a quick warmup scan
 			f=new PageFile(filename);
 			soup=new Soup("users",f,0);
-			List<JSONObject> list=soup.scan();
+			list=soup.scan();
 			list=null;
 			f.close();
 			f=null;
@@ -54,6 +58,7 @@ public class Test{
 			list=soup.scan();
 			for(int i=0;i<RECORDS;i++){
 				JSONObject obj=list.get(i);
+				// System.out.println(obj.toString());
 			}
 			f.close();
 			f=null;
@@ -77,7 +82,7 @@ public class Test{
 			f=null;
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
-		
+		*/
 			System.gc();
 			/*
 			System.out.println(" + Reading 50% of all objects");
@@ -156,11 +161,25 @@ public class Test{
 			System.out.println(" + Reading a single object");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,p1.getId());
+			soup=new Soup("users",f,0);
 
 			JSONObject obj=soup.scan(45001);
 			System.out.println(obj.toString());
 
+			post=System.currentTimeMillis();
+			System.out.println("   - Read in "+(post-pre)+"ms");
+
+			System.out.println(" + Reading a single object");
+			pre=System.currentTimeMillis();
+
+			obj=soup.scan(3);
+			System.out.println(obj.toString());
+
+			post=System.currentTimeMillis();
+			System.out.println("   - Read in "+(post-pre)+"ms");
+
+			pre=System.currentTimeMillis();
+			System.out.println(" + Updating a single object");
 			JSONObject objUpdate=new JSONObject();
 			objUpdate.put("firstName","Jason");
 			objUpdate.put("background","#FFB807");
@@ -168,18 +187,23 @@ public class Test{
 
 			soup.update(45001,objUpdate);
 			f.saveChanges();
+			post=System.currentTimeMillis();
+			System.out.println("   - Updated in "+(post-pre)+"ms");
 
 			obj=soup.scan(45001);
 			System.out.println(obj.toString());
 
+			pre=System.currentTimeMillis();
+			System.out.println(" + Deleting a single object");
 			soup.delete(45001);
 			f.saveChanges();
+			post=System.currentTimeMillis();
+			System.out.println("   - Deleted in "+(post-pre)+"ms");
 			obj=soup.scan(45001);
 			System.out.println(obj);
 
 			f.close();
-			post=System.currentTimeMillis();
-			System.out.println("   - Read in "+(post-pre)+"ms");
+			
 
 		}catch(Exception e){
 			e.printStackTrace();

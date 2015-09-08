@@ -15,10 +15,12 @@ public class Column{
 	}
 
 	public void delete(int oid) throws IOException{
+		ObjectSet set=new ObjectSet(false);
+		set.addOID(oid);
 		Page page=pageFile.getPage(rootId);
 		while(page!=null){
 			// Delete values
-			Variant.deleteValues(oid,page);
+			Variant.deleteValues(set,page);
 			// Find next page
 			int nextPageId=page.getNextPageId();
 			if(nextPageId==-1){
@@ -51,25 +53,27 @@ public class Column{
 		return page;
 	}
 
-	private List<Variant> scan(Page page) throws IOException{
+	private List<Variant> scan(Page page,ObjectSet set) throws IOException{
 		// System.out.println("scan("+page.getId()+")");
 		List<Variant> list=new ArrayList<Variant>();
 		DataInput in=page.getDataInput();
-		Variant v=Variant.readVariant(in);
+		Variant v=Variant.readVariant(in,set);
 		while(v!=null){
-			list.add(v);
-			v=Variant.readVariant(in);
+			if(v.getType()!=Variant.SKIP){
+				list.add(v);
+			}
+			v=Variant.readVariant(in,set);
 		}
 		return list;
 	}
 
-	public List<Variant> scan() throws IOException{
+	public List<Variant> scan(ObjectSet set) throws IOException{
 		// System.out.println("starting col scan at "+rootId);
 		List<Variant> list=new ArrayList<Variant>();
 		Page page=pageFile.getPage(rootId);
 		// System.out.println("Got page "+page.getId());
 		while(page!=null){
-			list.addAll(scan(page));
+			list.addAll(scan(page,set));
 			int next=page.getNextPageId();
 			// System.out.println("next:"+next);
 			if(next>-1){

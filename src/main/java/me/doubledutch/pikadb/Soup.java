@@ -20,8 +20,9 @@ public class Soup{
 	}
 
 	private void loadColumns() throws IOException{
+		ObjectSet set=new ObjectSet(true);
 		Map<String,Column> tmp=new HashMap<String,Column>();
-		List<Variant> list=metaData.scan();
+		List<Variant> list=metaData.scan(set);
 		int index=0;
 		while(list.size()>index){
 			Variant.String name=(Variant.String)list.get(index++);
@@ -80,70 +81,47 @@ public class Soup{
 	}
 
 	public List<JSONObject> scan(Collection<String> columns) throws IOException,JSONException{
-		Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
-		List<JSONObject> result=new ArrayList<JSONObject>();
-		for(String columnName:columns){
-
+		ObjectSet set=new ObjectSet(true);
+		/*for(String columnName:columns){
 			Column col=getColumn(columnName);
-			// System.out.println("Scanning column "+columnName+" at "+col.rootId);
-			List<Variant> list=col.scan();
+			List<Variant> list=col.scan(set);
 			for(Variant v:list){
-				int oid=v.getOID();
-				if(!objMap.containsKey(oid)){
-					JSONObject obj=new JSONObject();
-					objMap.put(oid,obj);
-					result.add(obj);
-				}
-				JSONObject obj=objMap.get(oid);
-				obj.put(columnName,v.getObjectValue());
+				set.addVariant(columnName,v);
 			}
 		}
-		return result;
+		return set.getObjectList();*/
+		return scan(set,columns);
 	}
 
 	public JSONObject scan(int oid)  throws IOException,JSONException{
-		JSONObject obj=new JSONObject();
-		Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
-		objMap.put(oid,obj);
-		scan(objMap);
-		if(JSONObject.getNames(obj)==null){
-			return null;
-		}
-		return obj;
+		return scan(oid,columnMap.keySet());
 	}
 
 	public JSONObject scan(int oid,Collection<String> columns)  throws IOException,JSONException{
-		JSONObject obj=new JSONObject();
-		Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
-		objMap.put(oid,obj);
-		scan(objMap,columns);
+		ObjectSet set=new ObjectSet(false);
+		set.addOID(oid);
+		scan(set,columns);
+		JSONObject obj=set.getObject(oid);
 		if(JSONObject.getNames(obj)==null){
 			return null;
 		}
 		return obj;
 	}
 
-	public List<JSONObject> scan(Map<Integer,JSONObject> objMap) throws IOException,JSONException{
-		return scan(objMap,columnMap.keySet());
+	public List<JSONObject> scan(ObjectSet set) throws IOException,JSONException{
+		return scan(set,columnMap.keySet());
 	}
 
-	public List<JSONObject> scan(Map<Integer,JSONObject> objMap,Collection<String> columns) throws IOException,JSONException{
-		// Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
-		List<JSONObject> result=new ArrayList<JSONObject>();
-		for(JSONObject obj:objMap.values()){
-			result.add(obj);
-		}
+	public List<JSONObject> scan(ObjectSet set,Collection<String> columns) throws IOException,JSONException{
 		for(String columnName:columns){
+			//System.out.println("Scanning column "+columnName);
 			Column col=columnMap.get(columnName);
-			List<Variant> list=col.scan();
+			List<Variant> list=col.scan(set);
 			for(Variant v:list){
-				int oid=v.getOID();
-				if(objMap.containsKey(oid)){
-					JSONObject obj=objMap.get(oid);
-					obj.put(columnName,v.getObjectValue());
-				}
+				//System.out.println(" - Adding value");
+				set.addVariant(columnName,v);
 			}
 		}
-		return result;
+		return set.getObjectList();
 	}
 }
