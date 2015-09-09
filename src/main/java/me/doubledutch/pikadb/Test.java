@@ -51,7 +51,7 @@ public class Test{
 			f=null;
 			System.gc();
 
-			System.out.println(" + Reading full objects");
+			System.out.println(" + Reading full objects - 100%");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
 			soup=new Soup("users",f,0);
@@ -65,6 +65,95 @@ public class Test{
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
 			System.gc();
+
+			
+			
+			System.out.println(" + Reading full objects - 50%");
+			pre=System.currentTimeMillis();
+			f=new PageFile(filename);
+			soup=new Soup("users",f,0);
+			ObjectSet set=new ObjectSet(false);
+			for(int i=0;i<RECORDS;i++){
+				if(i%2==0){
+					set.addOID(i);
+					
+				}
+			}
+			list=soup.scan(set);
+			for(int i=0;i<list.size();i++){
+				JSONObject obj=list.get(i);
+				// System.out.println(obj.toString());
+			}
+			f.close();
+			f=null;
+			post=System.currentTimeMillis();
+			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/2)/((post-pre)/1000.0))+" obj/s");
+			
+
+			System.out.println(" + Reading full objects - 25%");
+			pre=System.currentTimeMillis();
+			f=new PageFile(filename);
+			soup=new Soup("users",f,0);
+			set=new ObjectSet(false);
+			for(int i=0;i<RECORDS;i++){
+				if(i%4==0){
+					set.addOID(i);
+					
+				}
+			}
+			list=soup.scan(set);
+			for(int i=0;i<list.size();i++){
+				JSONObject obj=list.get(i);
+				// System.out.println(obj.toString());
+			}
+			f.close();
+			f=null;
+			post=System.currentTimeMillis();
+			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/2)/((post-pre)/1000.0))+" obj/s");
+			
+
+			System.out.println(" + Reading full objects - 5%");
+			pre=System.currentTimeMillis();
+			f=new PageFile(filename);
+			soup=new Soup("users",f,0);
+			set=new ObjectSet(false);
+			for(int i=0;i<RECORDS;i++){
+				if(i%20==0){
+					set.addOID(i);
+					
+				}
+			}
+			list=soup.scan(set);
+			for(int i=0;i<list.size();i++){
+				JSONObject obj=list.get(i);
+				// System.out.println(obj.toString());
+			}
+			f.close();
+			f=null;
+			post=System.currentTimeMillis();
+			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/2)/((post-pre)/1000.0))+" obj/s");
+			
+			System.out.println(" + Reading full objects - 1%");
+			pre=System.currentTimeMillis();
+			f=new PageFile(filename);
+			soup=new Soup("users",f,0);
+			set=new ObjectSet(false);
+			for(int i=0;i<RECORDS;i++){
+				if(i%100==0){
+					set.addOID(i);
+					
+				}
+			}
+			list=soup.scan(set);
+			for(int i=0;i<list.size();i++){
+				JSONObject obj=list.get(i);
+				// System.out.println(obj.toString());
+			}
+			f.close();
+			f=null;
+			post=System.currentTimeMillis();
+			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/2)/((post-pre)/1000.0))+" obj/s");
+			
 
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
@@ -84,28 +173,9 @@ public class Test{
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
 		
 			System.gc();
-			/*
-			System.out.println(" + Reading 50% of all objects");
-			pre=System.currentTimeMillis();
-			f=new PageFile(filename);
-			soup=new Soup("users",f,p1.getId());
-			Map<Integer,JSONObject> objMap=new HashMap<Integer,JSONObject>();
-			for(int i=0;i<RECORDS;i++){
-				if(i%2==0){
-					JSONObject obj=new JSONObject();
-					objMap.put(i,obj);
-				}
-			}
-			list=soup.scan(objMap);
-			for(int i=0;i<list.size();i++){
-				JSONObject obj=list.get(i);
-				// System.out.println(obj.toString());
-			}
-			f.close();
-			f=null;
-			post=System.currentTimeMillis();
-			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/2)/((post-pre)/1000.0))+" obj/s");
 
+
+			/*
 			System.gc();
 			System.out.println(" + Reading 50% of all objects partially");
 			pre=System.currentTimeMillis();
@@ -158,22 +228,31 @@ public class Test{
 			*/
 
 			System.gc();
-			System.out.println(" + Reading a single object");
+			System.out.println(" + Reading a single object - early");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
 			soup=new Soup("users",f,0);
 
-			JSONObject obj=soup.scan(45001);
-			System.out.println(obj.toString());
+			JSONObject obj=soup.scan(3);
+			// System.out.println(obj.toString());
 
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms");
 
-			System.out.println(" + Reading a single object");
+			System.out.println(" + Reading a single object - mid");
 			pre=System.currentTimeMillis();
 
-			obj=soup.scan(3);
-			System.out.println(obj.toString());
+			obj=soup.scan(45001);
+			// System.out.println(obj.toString());
+
+			post=System.currentTimeMillis();
+			System.out.println("   - Read in "+(post-pre)+"ms");
+
+			System.out.println(" + Reading a single object - late");
+			pre=System.currentTimeMillis();
+
+			obj=soup.scan(99003);
+			// System.out.println(obj.toString());
 
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms");
@@ -191,7 +270,7 @@ public class Test{
 			System.out.println("   - Updated in "+(post-pre)+"ms");
 
 			obj=soup.scan(45001);
-			System.out.println(obj.toString());
+			// System.out.println(obj.toString());
 
 			pre=System.currentTimeMillis();
 			System.out.println(" + Deleting a single object");
@@ -200,7 +279,7 @@ public class Test{
 			post=System.currentTimeMillis();
 			System.out.println("   - Deleted in "+(post-pre)+"ms");
 			obj=soup.scan(45001);
-			System.out.println(obj);
+			// System.out.println(obj);
 
 			f.close();
 			

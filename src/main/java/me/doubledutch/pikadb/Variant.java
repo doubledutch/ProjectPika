@@ -27,6 +27,7 @@ public abstract class Variant{
 	public static void deleteValues(ObjectSet set,Page page) throws IOException{
 		DataInput in=page.getDataInput();
 		int offset=0;
+		// TODO: we could be skipping our way through it here
 		Variant v=readVariant(in,set);
 		while(v!=null){
 			// Read values
@@ -37,7 +38,6 @@ public abstract class Variant{
 				}
 				page.addDiff(offset,deleteData);
 			}
-			// ERROR: the offset is no longer correct with skip variants - fix
 			offset+=v.getSize();
 			v=readVariant(in,set);
 		}
