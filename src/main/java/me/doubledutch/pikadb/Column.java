@@ -19,8 +19,10 @@ public class Column{
 		set.addOID(oid);
 		Page page=pageFile.getPage(rootId);
 		while(page!=null){
-			// Delete values
-			Variant.deleteValues(set,page);
+			if(page.isInBloomFilter(oid)){
+				// Delete values
+				Variant.deleteValues(set,page);
+			}
 			// Find next page
 			int nextPageId=page.getNextPageId();
 			if(nextPageId==-1){

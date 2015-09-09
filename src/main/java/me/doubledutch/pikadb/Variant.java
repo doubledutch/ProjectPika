@@ -14,7 +14,7 @@ public abstract class Variant{
 	public final static int DELETE=6;
 	public final static int SKIP=7;
 
-	public static Variant skipVariant=new Variant.Skip();
+	// public static Variant skipVariant=new Variant.Skip();
 
 	public abstract int getOID();
 	public abstract int getType();
@@ -37,6 +37,7 @@ public abstract class Variant{
 				}
 				page.addDiff(offset,deleteData);
 			}
+			// ERROR: the offset is no longer correct with skip variants - fix
 			offset+=v.getSize();
 			v=readVariant(in,set);
 		}
@@ -86,17 +87,20 @@ public abstract class Variant{
 				case STRING:return Variant.String.skipValue(in);
 				case BOOLEAN:return Variant.Boolean.skipValue(in);
 			}
-			return skipVariant;
+			// return skipVariant;
 		}
 		return null;
 	}
 
 	public static class Skip extends Variant{
-		public Skip(){
+		private int size;
+
+		public Skip(int size){
+			this.size=size;
 		}
 
 		public int getSize(){
-			return 0;
+			return size;
 		}
 
 		public int getOID(){
@@ -124,11 +128,13 @@ public abstract class Variant{
 		}
 
 		public static Variant readValue(int oid,DataInput in) throws IOException{
-			return Variant.skipVariant;
+			// return Variant.skipVariant;
+			return null;
 		}
 
 		public static Variant skipValue(DataInput in) throws IOException{
-			return skipVariant;
+			// return skipVariant;
+			return null;
 		}
 	}
 
@@ -169,7 +175,7 @@ public abstract class Variant{
 
 		public static Variant skipValue(DataInput in) throws IOException{
 			in.skipBytes(4);
-			return skipVariant;
+			return new Variant.Skip(1+4+4);
 		}
 
 		public byte[] toByteArray() throws IOException{
@@ -232,7 +238,7 @@ public abstract class Variant{
 
 		public static Variant skipValue(DataInput in) throws IOException{
 			in.skipBytes(1);
-			return skipVariant;
+			return new Variant.Skip(1+4+1);
 		}
 
 		public static Variant.Boolean readValue(int oid,DataInput in) throws IOException{
@@ -271,7 +277,7 @@ public abstract class Variant{
 
 		public static Variant skipValue(DataInput in) throws IOException{
 			in.skipBytes(4);
-			return skipVariant;
+			return new Variant.Skip(1+4+4);
 		}
 
 		public void writeVariant(DataOutput out) throws IOException{
@@ -325,7 +331,7 @@ public abstract class Variant{
 
 		public static Variant skipValue(DataInput in) throws IOException{
 			in.skipBytes(8);
-			return skipVariant;
+			return new Variant.Skip(1+4+8);
 		}
 
 		public void writeVariant(DataOutput out) throws IOException{
@@ -380,7 +386,7 @@ public abstract class Variant{
 		public static Variant skipValue(DataInput in) throws IOException{
 			short s=in.readShort();
 			in.skipBytes(s*2);
-			return skipVariant;
+			return new Variant.Skip(1+4+2+2*s);
 		}
 
 		public void writeVariant(DataOutput out) throws IOException{
