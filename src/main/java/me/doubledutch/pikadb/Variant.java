@@ -4,7 +4,7 @@ import java.io.*;
 import org.json.*;
 import java.util.*;
 
-public abstract class Variant{
+public abstract class Variant implements Comparable<Variant>{
 	public final static int STOP=0;
 	public final static int INTEGER=1;
 	public final static int FLOAT=2;
@@ -13,6 +13,7 @@ public abstract class Variant{
 	public final static int BOOLEAN=5;
 	public final static int DELETE=6;
 	public final static int SKIP=7;
+	public final static int LONG=8;
 
 	// public static Variant skipVariant=new Variant.Skip();
 
@@ -23,6 +24,8 @@ public abstract class Variant{
 	public abstract byte[] toByteArray() throws IOException;
 	public abstract void writeVariant(DataOutput out) throws IOException;
 	// public abstract void skipValue(DataInput in) throws IOException;
+
+	public abstract int compareTo(Variant v);
 
 	public static void deleteValues(ObjectSet set,Page page) throws IOException{
 		DataInput in=page.getDataInput();
@@ -47,25 +50,30 @@ public abstract class Variant{
 		if(obj instanceof java.lang.Integer){
 			return new Variant.Integer(oid,(java.lang.Integer)obj);
 		}
+		if(obj instanceof java.lang.String){
+			return new Variant.String(oid,(java.lang.String)obj);
+		}
 		if(obj instanceof java.lang.Float){
 			return new Variant.Float(oid,(java.lang.Float)obj);
 		}
 		if(obj instanceof java.lang.Double){
 			return new Variant.Double(oid,(java.lang.Double)obj);
 		}
-		if(obj instanceof java.lang.String){
-			return new Variant.String(oid,(java.lang.String)obj);
-		}
 		if(obj instanceof java.lang.Boolean){
 			return new Variant.Boolean(oid,(java.lang.Boolean)obj);
+		}
+		if(obj instanceof java.lang.Long){
+			return new Variant.Long(oid,(java.lang.Long)obj);
 		}
 		return null;
 	}
 
 	public static Variant readVariant(DataInput in,ObjectSet set) throws IOException{
 		byte type=in.readByte();
-		while(type==DELETE){
-			type=in.readByte();
+		int count=0;
+		if(type==DELETE){
+			// TODO: check that this works and think about an accumulative fix
+			return new Variant.Skip(1);
 		}
 		if(type==STOP){
 			return null;
@@ -74,6 +82,7 @@ public abstract class Variant{
 		if(set.contains(oid)){
 			switch(type){
 				case INTEGER:return Variant.Integer.readValue(oid,in);
+				case LONG:return Variant.Long.readValue(oid,in);
 				case FLOAT:return Variant.Float.readValue(oid,in);
 				case DOUBLE:return Variant.Double.readValue(oid,in);
 				case STRING:return Variant.String.readValue(oid,in);
@@ -82,6 +91,7 @@ public abstract class Variant{
 		}else{
 			switch(type){
 				case INTEGER:return Variant.Integer.skipValue(in);
+				case LONG:return Variant.Long.skipValue(in);
 				case FLOAT:return Variant.Float.skipValue(in);
 				case DOUBLE:return Variant.Double.skipValue(in);
 				case STRING:return Variant.String.skipValue(in);
@@ -135,6 +145,10 @@ public abstract class Variant{
 		public static Variant skipValue(DataInput in) throws IOException{
 			// return skipVariant;
 			return null;
+		}
+
+		public int compareTo(Variant v){
+			return 0;
 		}
 	}
 
@@ -190,6 +204,40 @@ public abstract class Variant{
 		public static Variant.Integer readValue(int oid,DataInput in) throws IOException{
 			return new Variant.Integer(oid,in.readInt());
 		}
+
+		// Returns a negative integer, zero, or a positive integer as this object is 
+		// less than, equal to, or greater than the specified object.
+		public int compareTo(Variant v){
+			switch(v.getType()){
+				case INTEGER:
+					int ival=((Variant.Integer)v).getValue();
+					if(ival<value)return -1;
+					if(ival==value)return 0;
+					return 1;
+				case LONG:
+					long lval=((Variant.Long)v).getValue();
+					if(lval<value)return -1;
+					if(lval==value)return 0;
+					return 1;
+				case FLOAT:
+					float fval=((Variant.Float)v).getValue();
+					if(fval<value)return -1;
+					if(fval==value)return 0;
+					return 1;
+				case DOUBLE:
+					double dval=((Variant.Double)v).getValue();
+					if(dval<value)return -1;
+					if(dval==value)return 0;
+					return 1;
+				case BOOLEAN:
+					return -1;
+				case STRING:
+					java.lang.String sval=((Variant.String)v).getValue();
+					java.lang.String str=java.lang.String.valueOf(value);
+					return str.compareTo(sval);
+			}
+			return 0;
+		}
 	}
 
 	public static class Boolean extends Variant{
@@ -243,6 +291,24 @@ public abstract class Variant{
 
 		public static Variant.Boolean readValue(int oid,DataInput in) throws IOException{
 			return new Variant.Boolean(oid,in.readBoolean());
+		}
+
+		public int compareTo(Variant v){
+			switch(v.getType()){
+				case INTEGER:
+					return 0;
+				case LONG:
+					return 0;
+				case FLOAT:
+					return 0;
+				case DOUBLE:
+					return 0;
+				case BOOLEAN:
+					return 0;
+				case STRING:
+					return 0;
+			}
+			return 0;
 		}
 	}
 
@@ -298,6 +364,40 @@ public abstract class Variant{
 		public static Variant.Float readValue(int oid,DataInput in) throws IOException{
 			return new Variant.Float(oid,in.readFloat());
 		}
+
+		// Returns a negative integer, zero, or a positive integer as this object is 
+		// less than, equal to, or greater than the specified object.
+		public int compareTo(Variant v){
+			switch(v.getType()){
+				case INTEGER:
+					int ival=((Variant.Integer)v).getValue();
+					if(ival<value)return -1;
+					if(ival==value)return 0;
+					return 1;
+				case LONG:
+					long lval=((Variant.Long)v).getValue();
+					if(lval<value)return -1;
+					if(lval==value)return 0;
+					return 1;
+				case FLOAT:
+					float fval=((Variant.Float)v).getValue();
+					if(fval<value)return -1;
+					if(fval==value)return 0;
+					return 1;
+				case DOUBLE:
+					double dval=((Variant.Double)v).getValue();
+					if(dval<value)return -1;
+					if(dval==value)return 0;
+					return 1;
+				case BOOLEAN:
+					return -1;
+				case STRING:
+					java.lang.String sval=((Variant.String)v).getValue();
+					java.lang.String str=java.lang.String.valueOf(value);
+					return str.compareTo(sval);
+			}
+			return 0;
+		}
 	}
 
 	public static class Double extends Variant{
@@ -351,6 +451,128 @@ public abstract class Variant{
 
 		public static Variant.Double readValue(int oid,DataInput in) throws IOException{
 			return new Variant.Double(oid,in.readDouble());
+		}
+
+		// Returns a negative integer, zero, or a positive integer as this object is 
+		// less than, equal to, or greater than the specified object.
+		public int compareTo(Variant v){
+			switch(v.getType()){
+				case INTEGER:
+					int ival=((Variant.Integer)v).getValue();
+					if(ival<value)return -1;
+					if(ival==value)return 0;
+					return 1;
+				case LONG:
+					long lval=((Variant.Long)v).getValue();
+					if(lval<value)return -1;
+					if(lval==value)return 0;
+					return 1;
+				case FLOAT:
+					float fval=((Variant.Float)v).getValue();
+					if(fval<value)return -1;
+					if(fval==value)return 0;
+					return 1;
+				case DOUBLE:
+					double dval=((Variant.Double)v).getValue();
+					if(dval<value)return -1;
+					if(dval==value)return 0;
+					return 1;
+				case BOOLEAN:
+					return -1;
+				case STRING:
+					java.lang.String sval=((Variant.String)v).getValue();
+					java.lang.String str=java.lang.String.valueOf(value);
+					return str.compareTo(sval);
+			}
+			return 0;
+		}
+	}
+
+	public static class Long extends Variant{
+		private int oid;
+		private long value;
+
+		public Long(int oid,long value){
+			this.oid=oid;
+			this.value=value;
+		}
+
+		public int getOID(){
+			return oid;
+		}
+
+		public int getSize(){
+			return 1+4+8;
+		}
+
+		public int getType(){
+			return LONG;
+		}
+
+		public Object getObjectValue(){
+			return value;
+		}
+
+		public long getValue(){
+			return value;
+		}
+
+		public static Variant skipValue(DataInput in) throws IOException{
+			in.skipBytes(8);
+			return new Variant.Skip(1+4+8);
+		}
+
+		public void writeVariant(DataOutput out) throws IOException{
+			out.writeByte(LONG);
+			out.writeInt(oid);
+			out.writeLong(value);
+		}
+
+		public byte[] toByteArray() throws IOException{
+			ByteArrayOutputStream data=new ByteArrayOutputStream();
+			DataOutputStream out=new DataOutputStream(data);
+			writeVariant(out);
+			out.flush();
+			out.close();
+			return data.toByteArray();
+		}
+
+		public static Variant.Long readValue(int oid,DataInput in) throws IOException{
+			return new Variant.Long(oid,in.readLong());
+		}
+
+		// Returns a negative integer, zero, or a positive integer as this object is 
+		// less than, equal to, or greater than the specified object.
+		public int compareTo(Variant v){
+			switch(v.getType()){
+				case INTEGER:
+					int ival=((Variant.Integer)v).getValue();
+					if(ival<value)return -1;
+					if(ival==value)return 0;
+					return 1;
+				case LONG:
+					long lval=((Variant.Long)v).getValue();
+					if(lval<value)return -1;
+					if(lval==value)return 0;
+					return 1;
+				case FLOAT:
+					float fval=((Variant.Float)v).getValue();
+					if(fval<value)return -1;
+					if(fval==value)return 0;
+					return 1;
+				case DOUBLE:
+					double dval=((Variant.Double)v).getValue();
+					if(dval<value)return -1;
+					if(dval==value)return 0;
+					return 1;
+				case BOOLEAN:
+					return -1;
+				case STRING:
+					java.lang.String sval=((Variant.String)v).getValue();
+					java.lang.String str=java.lang.String.valueOf(value);
+					return str.compareTo(sval);
+			}
+			return 0;
 		}
 	}
 
@@ -414,6 +636,35 @@ public abstract class Variant{
 				data[i]=in.readChar();
 			}
 			return new Variant.String(oid,new java.lang.String(data));
+		}
+
+		// Returns a negative integer, zero, or a positive integer as this object is 
+		// less than, equal to, or greater than the specified object.
+		public int compareTo(Variant v){
+			switch(v.getType()){
+				case INTEGER:
+					int ival=((Variant.Integer)v).getValue();
+					java.lang.String sval=java.lang.String.valueOf(ival);
+					return value.compareTo(sval);
+				case LONG:
+					long lval=((Variant.Long)v).getValue();
+					sval=java.lang.String.valueOf(lval);
+					return value.compareTo(sval);
+				case FLOAT:
+					float fval=((Variant.Float)v).getValue();
+					sval=java.lang.String.valueOf(fval);
+					return value.compareTo(sval);
+				case DOUBLE:
+					double dval=((Variant.Double)v).getValue();
+					sval=java.lang.String.valueOf(dval);
+					return value.compareTo(sval);
+				case BOOLEAN:
+					return -1;
+				case STRING:
+					sval=((Variant.String)v).getValue();
+					return value.compareTo(sval);
+			}
+			return 0;
 		}
 	}
 }
