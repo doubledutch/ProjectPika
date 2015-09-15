@@ -5,9 +5,10 @@ import java.io.*;
 
 public class Page{
 	public final static int HEADER=4+4+4;
-	public final static int PAYLOAD=8192-HEADER-4;
-	public final static int SIZE=PAYLOAD+HEADER+4;
+	public final static int PAYLOAD=4096-HEADER-8; 
+	public final static int SIZE=PAYLOAD+HEADER+8;
 	// TODO: add stop byte after data payload when creating and updating the file
+	// TODO: fix the EOF errors requiring -8
 
 	private int id;
 	private long offset;
@@ -27,10 +28,19 @@ public class Page{
 		this.pageFile=pageFile;
 
 		loadMetaData();
-		rawData=new byte[PAYLOAD];
-		pageFile.seek(offset+HEADER);
-		pageFile.readFully(rawData);
+		rawData=null;
+		// rawData=new byte[PAYLOAD];
+		// pageFile.seek(offset+HEADER);
+		// pageFile.readFully(rawData);
 		// System.out.println("Page opened: "+id+" nextPageId: "+nextPageId+" currentFill: "+currentFill);
+	}
+
+	private void loadRawData() throws IOException{
+		if(rawData==null){
+			rawData=new byte[PAYLOAD];
+			pageFile.seek(offset+HEADER);
+			pageFile.readFully(rawData);
+		}
 	}
 
 	public void saveMetaData() throws IOException{
@@ -93,6 +103,7 @@ public class Page{
 		if(!dirty){
 			return;
 		}
+		loadRawData();
 		// System.out.println("Page.SaveChanges");
 		for(PageDiff diff:diffList){
 			System.arraycopy(diff.getData(),
@@ -115,6 +126,7 @@ public class Page{
 	}
 
 	public DataInput getDataInput() throws IOException{
+		loadRawData();
 		return new DataInputStream(new ByteArrayInputStream(rawData));
 	}
 

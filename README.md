@@ -53,6 +53,34 @@ foo.2
 
 However, since the purpose of columns in Pika is to hold simple values, this breaks down once we have an array holding objects. One way to fix this, could be to add a simple value type that is an object reference. In that way, the inner objects in an array could be stored as any other object in the columns.... this however, could have some serious performance implications when we are trying to read objects back from the columns - but that's something we will get to later :-)
 
+## 2. Page Strategy
+
+All columns are stored in a series of linked pages. All pages are stored in a single pagefile. Every page has a bloomfilter for the object id's contained in the page, an integer holding the current page fill and a pointer for the next page - everything else is payload in the form of a stream of variants.
+
+I'm currently thinking about a change to a model where there is a page pointer in between each variant instead of a single next page pointer. This will allow us to build up a tree based structure of pages based on the page values... the question is, how do we sort values of different types stored in the same column?
+
+````
+4096 byte pages
+bloom and fill header = 4088 payload
+pointer, type and oid pr value
+
+for 4 byte integer... 4+4+1+4 = 13 byte pr value = 160 values pr page
+for 16 char string... 4+4+1+2+2*16 = 43 byte pr value = 95 values pr page
+
+{
+	"id":233992,
+	"username":"kasper.jeppesen",
+	"firstName":"Kasper",
+	"lastName":"Jeppesen",
+	"image":"/resources/image/233992-profile.png",
+	"created":"2015-09-02 16:37"
+}
+
+161 bytes as raw json storage
+
+228 byte in columns with 2 byte chars
+````
+
 ## X. Known needed improvements
 
 ### Column.java:knownFreePageId
