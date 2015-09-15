@@ -4,18 +4,18 @@ import java.util.*;
 import org.json.*;
 
 public class ObjectSet{
-	private Map<Integer,JSONObject> objectMap=new HashMap<Integer,JSONObject>();
-	private List<JSONObject> objectList=new ArrayList<JSONObject>();
+	private Map<String,Map<Integer,Variant>> columnValueMap=new HashMap<String,Map<Integer,Variant>>();
+	private Set<Integer> oidSet=new HashSet<Integer>();
+
 	private boolean open;
 	private int matchCounter;
-
 
 	public ObjectSet(boolean open){
 		this.open=open;
 	}
 
 	public boolean anyObjectsInBloomFilter(int bloomfilter){
-		for(int oid:objectMap.keySet()){
+		for(int oid:oidSet){
 			if((oid & bloomfilter) == oid){
 				return true;
 			}
@@ -28,7 +28,7 @@ public class ObjectSet{
 	}
 
 	public int getCount(){
-		return objectList.size();
+		return oidSet.size();
 	}
 
 	public int getMatchCount(){
@@ -39,40 +39,69 @@ public class ObjectSet{
 		matchCounter=0;
 	}
 
-	public boolean contains(int oid){
+	public boolean contains(Integer oid){
 		if(open){
 			return true;
 		}
-		if(objectMap.containsKey(oid)){
+		if(oidSet.contains(oid)){
 			matchCounter++;
 			return true;
 		}
 		return false;
 	}
 
-	public void addOID(int oid){
+	public void addOID(Integer oid){
+		// JSONObject obj=new JSONObject();
+		// objectMap.put(oid,obj)
+		// if(!oidSet.contains(oid)){
+			oidSet.add(oid);
+		// }
+		// objectList.add(obj);
+	}
+
+	public JSONObject getObject(Integer oid)throws JSONException{
+		if(!oidSet.contains(oid)){
+			return null;
+		}
 		JSONObject obj=new JSONObject();
-		objectMap.put(oid,obj);
-		objectList.add(obj);
+		for(String key:columnValueMap.keySet()){
+			Map<Integer,Variant> map=columnValueMap.get(key);
+			if(map.containsKey(oid)){
+				Variant v=map.get(oid);
+				obj.put(key,v.getObjectValue());
+			}
+		}
+		return obj;
+		// return objectMap.get(oid);
 	}
 
-	public JSONObject getObject(int oid){
-		return objectMap.get(oid);
-	}
-
-	public void addVariant(String columnName,Variant v) throws JSONException{ 
-		int oid=v.getOID();
-		if(!objectMap.containsKey(oid)){
+	public void addVariant(String columnName,Variant v){ 
+		Integer oid=v.getOID();
+		if(!oidSet.contains(oid)){
+			if(!open){
+				return;
+			}
+			addOID(oid);
+		}
+		if(!columnValueMap.containsKey(columnName)){
+			columnValueMap.put(columnName,new HashMap<Integer,Variant>());
+		}
+		columnValueMap.get(columnName).put(oid,v);
+		/*if(!objectMap.containsKey(oid)){
 			if(!open){
 				return;
 			}
 			addOID(oid);
 		}
 		JSONObject obj=objectMap.get(oid);
-		obj.put(columnName,v.getObjectValue());
+		obj.put(columnName,v.getObjectValue());*/
 	}
 
-	public List<JSONObject> getObjectList(){
+	public List<JSONObject> getObjectList()throws JSONException{
+		List<JSONObject> objectList=new ArrayList<JSONObject>();
+		for(Integer oid:oidSet){
+			objectList.add(getObject(oid));
+		}
 		return objectList;
 	}
 }

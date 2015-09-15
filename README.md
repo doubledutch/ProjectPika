@@ -81,6 +81,64 @@ for 16 char string... 4+4+1+2+2*16 = 43 byte pr value = 95 values pr page
 228 byte in columns with 2 byte chars
 ````
 
+
+MacBook-Pro:ProjectPika kasperjj$ java -jar build/libs/PikaDB-1.0.jar 
+ + Writing 100000 objects
+   - Write in 1552ms 64432 obj/s
+   - Database size : 13084kb
+ + Reading full objects - 100%
+   - Read in 545ms 183486 obj/s
+ + Reading full objects - 50%
+   - Read in 327ms 152905 obj/s
+ + Reading full objects - 25%
+   - Read in 244ms 204918 obj/s
+ + Reading full objects - 5%
+   - Read in 204ms 245098 obj/s
+ + Reading full objects - 1%
+   - Read in 304ms 164473 obj/s
+ + Reading partial objects
+   - Read in 155ms 645161 obj/s
+ + Reading a single object - early
+   - Read in 0ms
+ + Reading a single object - mid
+   - Read in 16ms
+ + Reading a single object - late
+   - Read in 19ms
+ + Updating a single object
+   - Updated in 9ms
+ + Deleting a single object
+   - Deleted in 12ms
+
+Post objectset refactor
+
+MacBook-Pro:ProjectPika kasperjj$ java -jar build/libs/PikaDB-1.0.jar 
+ + Writing 100000 objects
+   - Write in 1456ms 68681 obj/s
+   - Database size : 13084kb
+ + Reading full objects - 100%
+   - Read in 911ms 109769 obj/s
+ + Reading full objects - 50%
+   - Read in 338ms 147928 obj/s
+ + Reading full objects - 25%
+   - Read in 269ms 185873 obj/s
+ + Reading full objects - 5%
+   - Read in 199ms 251256 obj/s
+ + Reading full objects - 1%
+   - Read in 129ms 387596 obj/s
+ + Reading partial objects
+   - Read in 121ms 826446 obj/s
+ + Reading a single object - early
+   - Read in 1ms
+ + Reading a single object - mid
+   - Read in 14ms
+ + Reading a single object - late
+   - Read in 18ms
+ + Updating a single object
+   - Updated in 6ms
+ + Deleting a single object
+   - Deleted in 11ms
+
+
 ## X. Known needed improvements
 
 ### Column.java:knownFreePageId
@@ -94,4 +152,9 @@ Make the right choice between flushing full pages and writing individual diffs..
 ### Variant.java:getSize
 
 Due to the way we implemented DELETE markers in pages, the size of variants can't be trusted to calculate offsets.
+Note: this has been fixed, but the fix is horrible....
 
+### ObjectSet
+
+I changed objectset over to not build objects until the end (thus allowing multiple object types instead of just JSONObject)
+This created a performance penalty that gets larger the more objects... investigate and fix if possible.

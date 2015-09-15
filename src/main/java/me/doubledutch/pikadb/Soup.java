@@ -113,6 +113,7 @@ public class Soup{
 	}
 
 	public List<JSONObject> scan(ObjectSet set,Collection<String> columns) throws IOException,JSONException{
+		// long pre=System.currentTimeMillis();
 		for(String columnName:columns){
 			//System.out.println("Scanning column "+columnName);
 			Column col=columnMap.get(columnName);
@@ -122,6 +123,10 @@ public class Soup{
 				set.addVariant(columnName,v);
 			}
 		}
-		return set.getObjectList();
+		// long post=System.currentTimeMillis();
+		List<JSONObject> result= set.getObjectList();
+		// long create=System.currentTimeMillis();
+		// System.out.println((post-pre)+" "+(create-post));
+		return result;
 	}
 }
