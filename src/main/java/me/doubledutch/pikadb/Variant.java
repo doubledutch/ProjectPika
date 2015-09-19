@@ -97,7 +97,6 @@ public abstract class Variant implements Comparable<Variant>{
 				case STRING:return Variant.String.skipValue(in);
 				case BOOLEAN:return Variant.Boolean.skipValue(in);
 			}
-			// return skipVariant;
 		}
 		return null;
 	}

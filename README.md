@@ -139,6 +139,17 @@ MacBook-Pro:ProjectPika kasperjj$ java -jar build/libs/PikaDB-1.0.jar
    - Deleted in 11ms
 
 
+Quick test on actual android device
+
+Total test set 5000 user objects
+Create JSON and write to db (full flush) in 1654ms, 3022 obj/s
+Read all objects and create JSONObjects in 1266ms 3949 obj/s
+Read 10% of all objects and create JSONObjects in 203ms 2463 obj/s
+Read first object in 1ms
+Read one object mid set in 15ms
+Read last object in 20ms
+
+
 ## X. Known needed improvements
 
 ### Column.java:knownFreePageId

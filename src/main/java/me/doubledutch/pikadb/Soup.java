@@ -58,22 +58,27 @@ public class Soup{
 	}
 
 	public void update(int oid,JSONObject obj) throws IOException,JSONException{
-		for(String key:JSONObject.getNames(obj)){
-			Column col=getColumn(key);
-			Object value=obj.get(key);
-			Variant variant=Variant.createVariant(oid,value);
-			col.delete(oid);
-			col.append(variant);
-		}
+		Iterator<String> it=obj.keys();
+
+        while(it.hasNext()){
+            String key=it.next();
+            Column col=getColumn(key);
+            Object value=obj.get(key);
+            Variant variant=Variant.createVariant(oid,value);
+            col.delete(oid);
+            col.append(variant);
+        }
 	}
 
 	public void add(int oid,JSONObject obj) throws IOException,JSONException{
-		for(String key:JSONObject.getNames(obj)){
-			Column col=getColumn(key);
-			Object value=obj.get(key);
-			Variant variant=Variant.createVariant(oid,value);
-			col.append(variant);
-		}
+		Iterator<String> it=obj.keys();
+        while(it.hasNext()){
+            String key=it.next();
+            Column col=getColumn(key);
+            Object value=obj.get(key);
+            Variant variant=Variant.createVariant(oid,value);
+            col.append(variant);
+        }
 	}
 
 	public List<JSONObject> scan() throws IOException,JSONException{
@@ -99,13 +104,14 @@ public class Soup{
 
 	public JSONObject scan(int oid,Collection<String> columns)  throws IOException,JSONException{
 		ObjectSet set=new ObjectSet(false);
-		set.addOID(oid);
-		scan(set,columns);
-		JSONObject obj=set.getObject(oid);
-		if(JSONObject.getNames(obj)==null){
-			return null;
-		}
-		return obj;
+        set.addOID(oid);
+        scan(set,columns);
+        JSONObject obj=set.getObject(oid);
+        Iterator<String> it=obj.keys();
+        if(!it.hasNext()){
+            return null;
+        }
+        return obj;
 	}
 
 	public List<JSONObject> scan(ObjectSet set) throws IOException,JSONException{
