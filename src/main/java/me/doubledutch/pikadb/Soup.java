@@ -44,7 +44,7 @@ public class Soup{
 		Page page=pageFile.createPage();
 		metaData.append(new Variant.String(-1,name));
 		metaData.append(new Variant.Integer(-1,page.getId()));
-		pageFile.saveChanges();
+		pageFile.saveChanges(false);
 		Column col=new Column(pageFile,page.getId(),true);
 		columnMap.put(name,col);
 		return col;

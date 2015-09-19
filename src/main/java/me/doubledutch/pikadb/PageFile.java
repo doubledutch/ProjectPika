@@ -53,14 +53,18 @@ public class PageFile{
 		return getPage(id);
 	}
 
-	public void saveChanges() throws IOException{
+	public void saveChanges(boolean sort) throws IOException{
 		// Write to write ahead log
 		if(wal==null){
 			wal=new WriteAheadLog(filename);
 		}
 		wal.beginTransaction();
 		for(Page page:pageMap.values()){
-			page.commitChanges(wal);
+			if(page.isDirty() && page.getFillRatio()>0.5  && sort){ // TODO: figure out the right threshold
+				page.flatten();
+				Column.sort(page);
+			}
+		 	page.commitChanges(wal);
 		}
 		wal.closeTransaction();
 		// Write to page file

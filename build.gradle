@@ -9,7 +9,7 @@ defaultTasks = ['clean', 'jar']
 
 
 File javaHome = new File(System.getProperty('java.home'))
-logger.lifecycle "Using Java from $javaHome (version ${System.getProperty('java.version')})"
+// logger.lifecycle "Using Java from $javaHome (version ${System.getProperty('java.version')})"
 
 repositories {
     mavenLocal()

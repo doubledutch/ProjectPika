@@ -60,7 +60,7 @@ public class Column{
 		return page;
 	}
 
-	private List<Variant> scan(Page page,ObjectSet set) throws IOException{
+	protected static List<Variant> scan(Page page,ObjectSet set) throws IOException{
 		List<Variant> list=new ArrayList<Variant>();
 		DataInput in=page.getDataInput();
 		Variant v=Variant.readVariant(in,set);
@@ -103,9 +103,17 @@ public class Column{
 		return list;
 	}
 
-	public void sort(Page page) throws IOException{
+	public static void sort(Page page) throws IOException{
 		ObjectSet set=new ObjectSet(true);
 		List<Variant> list=scan(page,set);	
 		Collections.sort(list);	
+		Variant last=list.remove(list.size()-1);
+		list.add(0,last);
+		int offset=0;
+		for(Variant v:list){
+			page.addDiff(offset,v.toByteArray());
+			offset+=v.getSize();
+		}
+		page.setSorted(true);
 	}
 }

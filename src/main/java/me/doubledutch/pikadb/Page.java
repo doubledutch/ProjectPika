@@ -40,8 +40,24 @@ public class Page{
 		// System.out.println("Page opened: "+id+" nextPageId: "+nextPageId+" currentFill: "+currentFill);
 	}
 
+	public boolean isDirty(){
+		return dirty;
+	}
+
+	public float getFillRatio(){
+		return currentFill/(float)PAYLOAD;
+	}
+
 	public boolean isSorted(){
 		return type==SORTED;
+	}
+
+	public void setSorted(boolean val){
+		if(val){
+			type=SORTED;
+		}else{
+			type=UNSORTED;
+		}
 	}
 
 	public void makeUnsortable(){
@@ -114,12 +130,26 @@ public class Page{
 		wal.addMetaData(getId(),getNextPageId(),getCurrentFill());
 	}
 
+	public void flatten() throws IOException{
+		if(!dirty){
+			return;
+		}
+		loadRawData();
+		for(PageDiff diff:diffList){
+			System.arraycopy(diff.getData(),
+                        	0,
+                             rawData,
+                             diff.getOffset(),
+                             diff.getData().length);
+		}
+		diffList.clear();
+	}
+
 	public void saveChanges() throws IOException{
 		if(!dirty){
 			return;
 		}
 		loadRawData();
-		// System.out.println("Page.SaveChanges");
 		for(PageDiff diff:diffList){
 			System.arraycopy(diff.getData(),
                         	0,
@@ -129,13 +159,7 @@ public class Page{
 		}
 		pageFile.seek(offset+HEADER);
 		pageFile.write(rawData);
-		/*
-		Old diff by diff save
-		for(PageDiff diff:diffList){
-			pageFile.seek(offset+HEADER+diff.getOffset());
-			pageFile.write(diff.getData());
-		}
-		*/
+
 		saveMetaData();
 		dirty=false;
 	}

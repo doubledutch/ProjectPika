@@ -27,7 +27,7 @@ public class Test{
 				// obj.put("number",3.1415f);
 				soup.add(i,obj);
 			}
-			f.saveChanges();
+			f.saveChanges(true);
 			f.close();
 			f=null;
 			
@@ -213,7 +213,7 @@ public class Test{
 			objUpdate.put("SoMuchBoolean",false);
 
 			soup.update(RECORDS/2,objUpdate);
-			f.saveChanges();
+			f.saveChanges(false);
 			post=System.currentTimeMillis();
 			System.out.println("   - Updated in "+(post-pre)+"ms");
 
@@ -223,7 +223,7 @@ public class Test{
 			pre=System.currentTimeMillis();
 			System.out.println(" + Deleting a single object");
 			soup.delete(RECORDS/2);
-			f.saveChanges();
+			f.saveChanges(false);
 			post=System.currentTimeMillis();
 			System.out.println("   - Deleted in "+(post-pre)+"ms");
 			obj=soup.scan(RECORDS/2);
