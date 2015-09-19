@@ -150,16 +150,9 @@ public class Page{
 			return;
 		}
 		loadRawData();
-		for(PageDiff diff:diffList){
-			System.arraycopy(diff.getData(),
-                        	0,
-                             rawData,
-                             diff.getOffset(),
-                             diff.getData().length);
-		}
+		flatten();
 		pageFile.seek(offset+HEADER);
 		pageFile.write(rawData);
-
 		saveMetaData();
 		dirty=false;
 	}
