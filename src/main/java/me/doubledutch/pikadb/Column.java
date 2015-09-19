@@ -7,11 +7,13 @@ public class Column{
 	private PageFile pageFile;
 	public int rootId;
 	private int knownFreePageId;
+	private boolean sortable;
 
-	public Column(PageFile pageFile,int rootId){
+	public Column(PageFile pageFile,int rootId,boolean sortable){
 		this.pageFile=pageFile;
 		this.rootId=rootId;
 		knownFreePageId=rootId;
+		this.sortable=sortable;
 	}
 
 	public void delete(int oid) throws IOException{
@@ -41,11 +43,13 @@ public class Column{
 
 	private Page getFirstFit(int size) throws IOException{
 		Page page=pageFile.getPage(knownFreePageId);
-		while(page.getFreeSpace()<size){
+		while(page.isSorted() || page.getFreeSpace()<size){
 			int nextPageId=page.getNextPageId();
 			if(nextPageId==-1){
 				Page next=pageFile.createPage();
-				// System.out.println("next: "+next.getId());
+				if(!sortable){
+					next.makeUnsortable();
+				}
 				page.setNextPageId(next.getId());
 				page=next;
 			}else{
@@ -57,7 +61,6 @@ public class Column{
 	}
 
 	private List<Variant> scan(Page page,ObjectSet set) throws IOException{
-		// System.out.println("scan("+page.getId()+")");
 		List<Variant> list=new ArrayList<Variant>();
 		DataInput in=page.getDataInput();
 		Variant v=Variant.readVariant(in,set);
@@ -77,10 +80,8 @@ public class Column{
 
 	public List<Variant> scan(ObjectSet set) throws IOException{
 		set.resetMatchCounter();
-		// System.out.println("starting col scan at "+rootId);
 		List<Variant> list=new ArrayList<Variant>();
 		Page page=pageFile.getPage(rootId);
-		// System.out.println("Got page "+page.getId());
 		while(page!=null){
 			if((!set.isOpen()) && set.anyObjectsInBloomFilter(page.getBloomFilter())){
 				list.addAll(scan(page,set));
@@ -93,7 +94,6 @@ public class Column{
 				}
 			}
 			int next=page.getNextPageId();
-			// System.out.println("next:"+next);
 			if(next>-1){
 				page=pageFile.getPage(next);
 			}else{
@@ -101,5 +101,11 @@ public class Column{
 			}
 		}
 		return list;
+	}
+
+	public void sort(Page page) throws IOException{
+		ObjectSet set=new ObjectSet(true);
+		List<Variant> list=scan(page,set);	
+		Collections.sort(list);	
 	}
 }

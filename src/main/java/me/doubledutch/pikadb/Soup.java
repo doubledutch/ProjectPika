@@ -15,7 +15,7 @@ public class Soup{
 		this.name=name;
 		this.pageFile=pageFile;
 		this.rootPageId=rootPageId;
-		metaData=new Column(pageFile,rootPageId);
+		metaData=new Column(pageFile,rootPageId,false);
 		loadColumns();
 	}
 
@@ -27,8 +27,7 @@ public class Soup{
 		while(list.size()>index){
 			Variant.String name=(Variant.String)list.get(index++);
 			Variant.Integer pageId=(Variant.Integer)list.get(index++);
-			// System.out.println("Found column "+name.getValue()+" at "+pageId.getValue());
-			Column col=new Column(pageFile,pageId.getValue());
+			Column col=new Column(pageFile,pageId.getValue(),true);
 			tmp.put(name.getValue(),col);
 		}
 		columnMap=tmp;
@@ -46,7 +45,7 @@ public class Soup{
 		metaData.append(new Variant.String(-1,name));
 		metaData.append(new Variant.Integer(-1,page.getId()));
 		pageFile.saveChanges();
-		Column col=new Column(pageFile,page.getId());
+		Column col=new Column(pageFile,page.getId(),true);
 		columnMap.put(name,col);
 		return col;
 	}
@@ -87,14 +86,6 @@ public class Soup{
 
 	public List<JSONObject> scan(Collection<String> columns) throws IOException,JSONException{
 		ObjectSet set=new ObjectSet(true);
-		/*for(String columnName:columns){
-			Column col=getColumn(columnName);
-			List<Variant> list=col.scan(set);
-			for(Variant v:list){
-				set.addVariant(columnName,v);
-			}
-		}
-		return set.getObjectList();*/
 		return scan(set,columns);
 	}
 
@@ -119,20 +110,13 @@ public class Soup{
 	}
 
 	public List<JSONObject> scan(ObjectSet set,Collection<String> columns) throws IOException,JSONException{
-		// long pre=System.currentTimeMillis();
 		for(String columnName:columns){
-			//System.out.println("Scanning column "+columnName);
 			Column col=columnMap.get(columnName);
 			List<Variant> list=col.scan(set);
 			for(Variant v:list){
-				//System.out.println(" - Adding value");
 				set.addVariant(columnName,v);
 			}
 		}
-		// long post=System.currentTimeMillis();
-		List<JSONObject> result= set.getObjectList();
-		// long create=System.currentTimeMillis();
-		// System.out.println((post-pre)+" "+(create-post));
-		return result;
+		return set.getObjectList();
 	}
 }
