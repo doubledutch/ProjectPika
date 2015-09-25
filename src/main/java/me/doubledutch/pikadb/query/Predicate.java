@@ -47,12 +47,19 @@ public class Predicate{
 	public Predicate or(Predicate p1){
 		return new Predicate(OR,null,this,p1);
 	}
-	
+
 	public Predicate and(Predicate p1){
 		return new Predicate(AND,null,this,p1);
 	}
 
 	public Predicate not(){
 		return new Predicate(NOT,null,this,null);
+	}
+
+	public boolean testVariant(Variant v){
+		switch(type){
+			case EQUALS:return v.equals(value);
+		}
+		return false;
 	}
 }

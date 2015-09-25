@@ -7,7 +7,7 @@ import org.json.*;
 public class Test{
 	public static void main(String args[]){
 		String filename="./test.data";
-		int RECORDS=25000;
+		int RECORDS=100000;
 		try{	
 			System.out.println(" + Writing "+RECORDS+" objects");
 

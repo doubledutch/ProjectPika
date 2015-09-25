@@ -33,6 +33,14 @@ public class Soup{
 		columnMap=tmp;
 	}
 
+	public void declareColumn(String name,boolean sortable) throws IOException{
+
+	}
+
+	public void declareColumn(String name,boolean sortable,int type,boolean nullable,boolean required) throws IOException{
+		
+	}
+
 	private Column getColumn(String name) throws IOException{
 		if(!columnMap.containsKey(name)){
 			return createColumn(name);

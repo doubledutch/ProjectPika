@@ -102,7 +102,7 @@ public abstract class Variant implements Comparable<Variant>{
 	}
 
 	public static class Skip extends Variant{
-		private int size;
+		private final int size;
 
 		public Skip(int size){
 			this.size=size;
@@ -152,8 +152,8 @@ public abstract class Variant implements Comparable<Variant>{
 	}
 
 	public static class Integer extends Variant{
-		private int oid;
-		private int value;
+		private final int oid;
+		private final int value;
 
 		public Integer(int oid,int value){
 			this.oid=oid;
@@ -240,8 +240,8 @@ public abstract class Variant implements Comparable<Variant>{
 	}
 
 	public static class Boolean extends Variant{
-		private int oid;
-		private boolean value;
+		private final int oid;
+		private final boolean value;
 
 		public Boolean(int oid,boolean value){
 			this.oid=oid;
@@ -312,8 +312,8 @@ public abstract class Variant implements Comparable<Variant>{
 	}
 
 	public static class Float extends Variant{
-		private int oid;
-		private float value;
+		private final int oid;
+		private final float value;
 
 		public Float(int oid,float value){
 			this.oid=oid;
@@ -400,8 +400,8 @@ public abstract class Variant implements Comparable<Variant>{
 	}
 
 	public static class Double extends Variant{
-		private int oid;
-		private double value;
+		private final int oid;
+		private final double value;
 
 		public Double(int oid,double value){
 			this.oid=oid;
@@ -488,8 +488,8 @@ public abstract class Variant implements Comparable<Variant>{
 	}
 
 	public static class Long extends Variant{
-		private int oid;
-		private long value;
+		private final int oid;
+		private final long value;
 
 		public Long(int oid,long value){
 			this.oid=oid;
@@ -576,8 +576,8 @@ public abstract class Variant implements Comparable<Variant>{
 	}
 
 	public static class String extends Variant{
-		private int oid;
-		private java.lang.String value;
+		private final int oid;
+		private final java.lang.String value;
 
 		public String(int oid,java.lang.String value){
 			this.oid=oid;
