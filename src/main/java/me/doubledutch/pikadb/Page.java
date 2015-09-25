@@ -23,14 +23,17 @@ public class Page{
 	private int bloomfilter=0;
 	private int type=UNSORTED;
 
+	private PageFile pageHandler;
+
 	private boolean dirty=false;
 
 	private List<PageDiff> diffList=new LinkedList<PageDiff>();
 
-	public Page(int id,long offset,RandomAccessFile pageFile) throws IOException{
+	public Page(int id,long offset,RandomAccessFile pageFile,PageFile pageHandler) throws IOException{
 		this.id=id;
 		this.offset=offset;
 		this.pageFile=pageFile;
+		this.pageHandler=pageHandler;
 
 		loadMetaData();
 		rawData=null;
@@ -64,8 +67,13 @@ public class Page{
 		type=UNSORTABLE;
 	}
 
+	protected void unloadRawData(){
+		rawData=null;
+	}
+
 	private void loadRawData() throws IOException{
 		if(rawData==null){
+			pageHandler.trimPageSet(id);
 			rawData=new byte[PAYLOAD];
 			pageFile.seek(offset+HEADER);
 			pageFile.readFully(rawData);

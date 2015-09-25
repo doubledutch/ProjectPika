@@ -28,11 +28,18 @@ public class PageFile{
 		// Replay everything in the write ahead log
 	}
 
+
+	private void trimPageSet(int id){
+
+	}
+
 	public Page getPage(int id) throws IOException{
+		// Call a method to trim in memory pages
+		trimPageSet(id);
 		if(pageMap.containsKey(id)){
 			return pageMap.get(id);
 		}
-		Page page=new Page(id,id*Page.SIZE,pageFile);
+		Page page=new Page(id,id*Page.SIZE,pageFile,this);
 		pageMap.put(id,page);
 		return page;
 	}

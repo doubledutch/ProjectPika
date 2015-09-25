@@ -59,6 +59,7 @@ public class Predicate{
 	public boolean testVariant(Variant v){
 		switch(type){
 			case EQUALS:return v.equals(value);
+			case OR:return leftChild.testVariant(v) || rightChild.testVariant(v);
 		}
 		return false;
 	}
