@@ -10,6 +10,8 @@ public class PageFile{
 	private FileChannel pageFileChannel;
 	private String filename;
 	private WriteAheadLog wal=null;
+	public static int LRU_SIZE = 50;
+	private Deque<Page> pageLRU;
 
 	public PageFile(String filename) throws IOException{
 		this.filename=filename;
@@ -22,15 +24,27 @@ public class PageFile{
 			ftest.delete();
 			wal=null;
 		}
+		this.pageLRU = new LinkedList<Page>();
 	}
 
 	private void recoverTransaction(){
 		// Replay everything in the write ahead log
 	}
 
+	protected void trimPageSet(int id){
+		if (!pageMap.containsKey(id)) {
+			return;
+		}
 
-	private void trimPageSet(int id){
-
+		if (pageLRU.size() >= LRU_SIZE) {
+			Page evict=pageLRU.removeLast();
+			evict.unloadRawData();
+		}
+		Page page=pageMap.get(id);
+		if (pageLRU.contains(page)) {
+			pageLRU.remove(page);
+		}
+		pageLRU.add(page);
 	}
 
 	public Page getPage(int id) throws IOException{
@@ -71,7 +85,7 @@ public class PageFile{
 				page.flatten();
 				Column.sort(page);
 			}
-		 	page.commitChanges(wal);
+			page.commitChanges(wal);
 		}
 		wal.closeTransaction();
 		// Write to page file
