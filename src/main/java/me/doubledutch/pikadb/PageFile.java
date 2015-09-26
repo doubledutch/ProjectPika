@@ -5,7 +5,7 @@ import java.nio.channels.*;
 import java.util.*;
 
 public class PageFile{
-	private Map<Integer,Page> pageMap=new HashMap<Integer,Page>();
+	protected Map<Integer,Page> pageMap=new HashMap<Integer,Page>();
 	private RandomAccessFile pageFile;
 	private FileChannel pageFileChannel;
 	private String filename;
@@ -23,7 +23,7 @@ public class PageFile{
 			ftest.delete();
 			wal=null;
 		}
-		this.cache=new LRUPageCache(pageMap, 20);
+		this.cache=new SLRUPageCache(pageMap, 500);
 	}
 
 	private void recoverTransaction(){

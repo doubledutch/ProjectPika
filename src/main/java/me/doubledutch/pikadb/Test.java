@@ -229,6 +229,17 @@ public class Test{
 			obj=soup.scan(RECORDS/2);
 			// System.out.println(obj);
 
+			int totalHit, totalMiss;
+			totalHit = totalMiss = 0;
+			for (Map.Entry<Integer,Page> entry : f.pageMap.entrySet()){
+				Page page=entry.getValue();
+				totalHit += page.cacheHit;
+				totalMiss += page.cacheMiss;
+				//if (page.cacheMiss > 0 || page.cacheHit > 0){
+				//	System.out.println("Page "+entry.getKey()+": "+page.cacheHit+" hits, "+page.cacheMiss+" misses");
+				//}
+			}
+			System.out.println(" -- Cache hit ratio: "+(float)totalHit/(totalMiss+totalHit));
 			f.close();
 			
 			/*
