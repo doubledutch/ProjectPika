@@ -10,8 +10,9 @@ public class PageFile{
 	private FileChannel pageFileChannel;
 	private String filename;
 	private WriteAheadLog wal=null;
-	public static int LRU_SIZE = 50;
+	public static int LRU_SIZE = 10;
 	private Deque<Page> pageLRU;
+	private Deque<Page> pageSecondLRU;
 
 	public PageFile(String filename) throws IOException{
 		this.filename=filename;
@@ -25,6 +26,7 @@ public class PageFile{
 			wal=null;
 		}
 		this.pageLRU = new LinkedList<Page>();
+		this.pageSecondLRU = new LinkedList<Page>();
 	}
 
 	private void recoverTransaction(){
@@ -36,6 +38,42 @@ public class PageFile{
 			return;
 		}
 
+		// -- SLRU --
+		// If the page exists in L1
+		// If L2 at size, move end to back of L2
+		// Else, move it to L2
+		Page page=pageMap.get(id);
+		if (pageLRU.contains(page)) {
+			pageLRU.remove(page);
+			pageSecondLRU.addLast(page);
+			//System.out.println("L2 addition");
+			if (pageSecondLRU.size() > LRU_SIZE) {
+				Page toOne=pageSecondLRU.removeLast();
+				pageLRU.addFirst(toOne);
+				//System.out.println("L2 eviction");
+			}
+			return;
+		}
+		// If page exists in L2, move to L2 front
+		if (pageSecondLRU.contains(page)) {
+			//System.out.println("L2 update");
+			pageSecondLRU.remove(page);
+			pageSecondLRU.addFirst(page);
+			return;
+		}
+		// If L1 size is maximum, move back to L2 front
+		// Put at front of L1 cache
+		//System.out.println("L1 addition");
+		pageLRU.addFirst(page);
+		if (pageLRU.size() > LRU_SIZE) {
+			//System.out.println("L1 eviction");
+			Page evict=pageLRU.removeLast();
+			evict.unloadRawData();
+		}
+
+		//
+
+		/* -- LRU --
 		if (pageLRU.size() >= LRU_SIZE) {
 			Page evict=pageLRU.removeLast();
 			evict.unloadRawData();
@@ -45,6 +83,7 @@ public class PageFile{
 			pageLRU.remove(page);
 		}
 		pageLRU.add(page);
+		*/
 	}
 
 	public Page getPage(int id) throws IOException{
