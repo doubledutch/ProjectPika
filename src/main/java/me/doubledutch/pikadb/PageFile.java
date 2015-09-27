@@ -23,7 +23,7 @@ public class PageFile{
 			ftest.delete();
 			wal=null;
 		}
-		this.cache=new SLRUPageCache(pageMap, 500);
+		this.cache=new SLRUPageCache(pageMap, 100);
 	}
 
 	private void recoverTransaction(){
