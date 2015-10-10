@@ -3,6 +3,9 @@ package me.doubledutch.pikadb;
 import java.util.*;
 import java.io.*;
 
+import me.doubledutch.pikadb.page.Page;
+import me.doubledutch.pikadb.page.PageFile;
+
 
 public class Column{
 	private PageFile pageFile;

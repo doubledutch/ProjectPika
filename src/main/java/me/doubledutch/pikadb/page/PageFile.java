@@ -1,11 +1,14 @@
-package me.doubledutch.pikadb;
+package me.doubledutch.pikadb.page;
 
 import java.io.*;
 import java.nio.channels.*;
 import java.util.*;
 
+import me.doubledutch.pikadb.Column;
+import me.doubledutch.pikadb.WriteAheadLog;
+
 public class PageFile{
-	protected Map<Integer,Page> pageMap=new HashMap<Integer,Page>();
+	public Map<Integer,Page> pageMap=new HashMap<Integer,Page>();
 	private RandomAccessFile pageFile;
 	private FileChannel pageFileChannel;
 	private String filename;

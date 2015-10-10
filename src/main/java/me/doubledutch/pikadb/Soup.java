@@ -2,6 +2,10 @@ package me.doubledutch.pikadb;
 
 import java.io.*;
 import java.util.*;
+
+import me.doubledutch.pikadb.page.Page;
+import me.doubledutch.pikadb.page.PageFile;
+
 import org.json.*;
 
 public class Soup{

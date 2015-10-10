@@ -1,7 +1,11 @@
 package me.doubledutch.pikadb;
 
 import java.io.*;
+
+import me.doubledutch.pikadb.page.Page;
+
 import org.json.*;
+
 import java.util.*;
 
 public abstract class Variant implements Comparable<Variant>{

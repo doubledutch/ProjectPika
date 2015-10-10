@@ -1,4 +1,4 @@
-package me.doubledutch.pikadb;
+package me.doubledutch.pikadb.page;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

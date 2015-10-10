@@ -1,5 +1,7 @@
 package me.doubledutch.pikadb;
 
+import me.doubledutch.pikadb.page.PageDiff;
+
 public class WriteAheadLog{
 	public WriteAheadLog(String filename){
 

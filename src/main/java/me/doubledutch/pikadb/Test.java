@@ -2,6 +2,10 @@ package me.doubledutch.pikadb;
 
 import java.io.*;
 import java.util.*;
+
+import me.doubledutch.pikadb.page.Page;
+import me.doubledutch.pikadb.page.PageFile;
+
 import org.json.*;
 
 public class Test{
@@ -233,8 +237,8 @@ public class Test{
 			totalHit = totalMiss = 0;
 			for (Map.Entry<Integer,Page> entry : f.pageMap.entrySet()){
 				Page page=entry.getValue();
-				totalHit += page.cacheHit;
-				totalMiss += page.cacheMiss;
+				totalHit += page.getCacheHits();
+				totalMiss += page.getCacheMisses();
 				//if (page.cacheMiss > 0 || page.cacheHit > 0){
 				//	System.out.println("Page "+entry.getKey()+": "+page.cacheHit+" hits, "+page.cacheMiss+" misses");
 				//}
