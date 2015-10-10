@@ -11,6 +11,7 @@ public class PageFile{
 	private String filename;
 	private WriteAheadLog wal=null;
 	private PageCache cache;
+	private static int CACHE_SIZE = 500;
 
 	public PageFile(String filename) throws IOException{
 		this.filename=filename;
@@ -23,7 +24,7 @@ public class PageFile{
 			ftest.delete();
 			wal=null;
 		}
-		this.cache=new SLRUPageCache(pageMap, 500);
+		this.cache=new SLRUPageCache(pageMap, CACHE_SIZE);
 	}
 
 	private void recoverTransaction(){
