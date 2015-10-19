@@ -2,25 +2,11 @@
 <head>
   <meta charset="utf-8"/>
   <title>PikaDB</title>
-  <link rel="stylesheet" href="et-bembo.css"/>
   <link rel="stylesheet" href="tufte.css"/>
-  <link rel="stylesheet" href="latex.css"/>
+  <link rel="stylesheet" href="et-bembo.css"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style type="text/css">
-   img { mix-blend-mode: multiply; }
 
-   table#newspaper-tone > thead > tr > th:first-child { padding-right: 20%; }
-   table#newspaper-tone > tbody > tr > td:nth-child(1) { padding-right: 15%; }
-   table#newspaper-tone > thead > tr > th:nth-child(2) { width: 70px; }
-   table#newspaper-tone > thead > tr > th:nth-child(3) { padding: 0 59px;
-                                                         min-width: 100px; }
-   
-   @media screen and (max-width: 760px) { table#newspaper-tone > thead > tr > th:first-child { padding-right: 0; }
-                                          table#newspaper-tone > thead > tr > th:nth-child(2) { padding-right: 0; }
-                                          table#newspaper-tone > thead > tr > th:nth-child(3) { padding-right: 0; }
-                                          table#newspaper-tone > tbody > tr > td:nth-child(1) { padding-right: 0; }
-                                          table#newspaper-tone > tbody > tr > td:nth-child(2) { padding-right: 0; }
-                                          table#newspaper-tone > tbody > tr > td:nth-child(3) { padding-right: 0; }}
   </style>
 </head>
 
@@ -29,10 +15,36 @@
 	    <h1>PikaDB Internals</h1>
 	    <p class="subtitle">Kasper J. Jeppesen</p>
 	    <section>
-	      <p>PikaDB is an open source<label for="sn-tufte-handout" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-tufte-handout" class="margin-toggle"/> column oriented database targeted at embedded use for mobile devices.</p>
-	        <span class="sidenote">
-	          PikaDB is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.
+			<p>PikaDB is an open source<label for="sn-tufte-handout" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-tufte-handout" class="margin-toggle"/> database build for use in mobile applications. It uses a column oriented database approach and supports fine grained per value change notifications. This article covers its architecture for anyone who may be curious about how it works or is interested in contributing to the project.
+			<span class="sidenote">
+				PikaDB was started as an internal project at <a href="http://doubledutch.me/">DoubleDutch</a> and has been released  under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a> at <a href="https://github.com/doubledutch/ProjectPika/">github.com/doubledutch/ProjectPika</a>.
+			</span></p>
+	    </section>
+	    <section>
+	      <h2>Introduction to Column Oriented Databases</h2>
+	      <p>A column oriented database<label for="sn-tufte-handout" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-tufte-handout" class="margin-toggle"/> stores data separately for each column in its tables instead of on a per row basis. Think of it as a seperate table for each column with two of its own columns - a row id and a value. When data is read back from disk, each of these column tables are read separately and linked back together through a join operation.
+	      	<span class="sidenote">
+	          There have been many implementations of column oriented databases over the past couple of decades. For a closer look at column oriented databases currently in use, have a look at <a href="https://www.monetdb.org/">MonetDB</a> and Google BigTable.
+	        </span></p>
+	       <p>
+	        This strategy typically makes a column oriented database slower when writing and reading full rows<label for="sn-tufte-handout" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-tufte-handout" class="margin-toggle"/>, but once you start reading and writing values in just a couple of columns at a time, the column oriented model will bring performance gains with it. 
+	       In fact, in a column oriented database, there is no performance penalty for having hundreds of columns - if you are just reading two, your read time will remain the same no matter how many columns are added. This makes the column oriented model very suitable for a schemaless approach where a multitude of metadata can be tagged onto a row using as many columns as needed.
+	       <span class="sidenote">
+	          There are exceptions, such as when columns consist of very similar data that can be compressed better when grouped together - thus resulting in less IO to read the data from disk.
 	        </span>
+	       </p>
+	      <h3>Object Mapping</h3>
+	      <p>From objects to data and back</p>
+	      <h3>Server Side API</h3>
+	      <p>Speaking in json natively</p>
+	    </section>
+	    <section>
+	      <h2>Storage Engine</h2>
+	      <p>One file composed of individual pages. Columns are stored starting in one page with linked pages following. Each page is simply a list of variants with a bit of header material. Talk about bloom filters and sorting., pages and variants</p>
+	      <h3></h3>
+	      <p>Actual storage model</p>
+	      <h3></h3>
+	      <p>Speaking in json natively</p>
 	    </section>
     </article>
 </body>
