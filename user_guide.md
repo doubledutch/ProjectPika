@@ -15,3 +15,9 @@ user.declareColumn("ProfileURL",STRING);
 
 You do not have to declare tables and columns before you use them a declaration is only needed if you want PikaDB to enforce a constraint.
 
+````
+PikaDB db=new PikaDB("mydatafile.db");
+Table user=db.declareTable("TimeSeries",PRESERVE_ORDER);
+user.declareColumn("Id",INT,REQUIRED);
+user.declareColumn("Value",NUMERIC,REQUIRED);
+````
