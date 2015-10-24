@@ -26,5 +26,9 @@ user.declareColumn("Value",NUMERIC,REQUIRED);
 
 ```java
 PikaDB db=new PikaDB("mydatafile.db");
-ResultSet rs=db.select("Id","Username").from("Users").where("Username").contains("king");
+PikaCursor cr=db.select("Id","Username").from("Users").where("Username").contains("king");
+while(cr.moveNext()){
+	int id=cr.getInt(0);
+	String username=cr.getString(1);
+}
 ````
