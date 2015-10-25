@@ -1,15 +1,20 @@
-package me.doubledutch.pikadb;
+package me.doubledutch.pikadb.page;
 
 import java.io.*;
 import java.nio.channels.*;
 import java.util.*;
 
+import me.doubledutch.pikadb.Column;
+import me.doubledutch.pikadb.WriteAheadLog;
+
 public class PageFile{
-	private Map<Integer,Page> pageMap=new HashMap<Integer,Page>();
+	public Map<Integer,Page> pageMap=new HashMap<Integer,Page>();
 	private RandomAccessFile pageFile;
 	private FileChannel pageFileChannel;
 	private String filename;
 	private WriteAheadLog wal=null;
+	private PageCache cache;
+	private static int CACHE_SIZE = 500;
 
 	public PageFile(String filename) throws IOException{
 		this.filename=filename;
@@ -22,15 +27,15 @@ public class PageFile{
 			ftest.delete();
 			wal=null;
 		}
+		this.cache=new SLRUPageCache(pageMap, CACHE_SIZE);
 	}
 
 	private void recoverTransaction(){
 		// Replay everything in the write ahead log
 	}
 
-
-	private void trimPageSet(int id){
-
+	protected void trimPageSet(int id){
+		cache.Set(id);
 	}
 
 	public Page getPage(int id) throws IOException{
@@ -71,7 +76,7 @@ public class PageFile{
 				page.flatten();
 				Column.sort(page);
 			}
-		 	page.commitChanges(wal);
+			page.commitChanges(wal);
 		}
 		wal.closeTransaction();
 		// Write to page file

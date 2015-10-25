@@ -1,7 +1,9 @@
-package me.doubledutch.pikadb;
+package me.doubledutch.pikadb.page;
 
 import java.util.*;
 import java.io.*;
+
+import me.doubledutch.pikadb.WriteAheadLog;
 
 public class Page{
 	public static int UNSORTED=0;
@@ -28,6 +30,8 @@ public class Page{
 	private boolean dirty=false;
 
 	private List<PageDiff> diffList=new LinkedList<PageDiff>();
+
+	private int cacheMiss, cacheHit;
 
 	public Page(int id,long offset,RandomAccessFile pageFile,PageFile pageHandler) throws IOException{
 		this.id=id;
@@ -74,9 +78,12 @@ public class Page{
 	private void loadRawData() throws IOException{
 		if(rawData==null){
 			pageHandler.trimPageSet(id);
+			cacheMiss++;
 			rawData=new byte[PAYLOAD];
 			pageFile.seek(offset+HEADER);
 			pageFile.readFully(rawData);
+		} else {
+			cacheHit++;
 		}
 	}
 
@@ -180,5 +187,13 @@ public class Page{
 		currentFill+=data.length;
 		dirty=true;
 		// System.out.println("currentFill: "+id+" "+currentFill+" "+data.length);
+	}
+	
+	public int getCacheHits() {
+		return cacheHit;
+	}
+	
+	public int getCacheMisses() {
+		return cacheMiss;
 	}
 }

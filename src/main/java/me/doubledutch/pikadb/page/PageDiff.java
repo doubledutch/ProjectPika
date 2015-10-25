@@ -1,4 +1,4 @@
-package me.doubledutch.pikadb;
+package me.doubledutch.pikadb.page;
 
 public class PageDiff{
 	private int offset;
