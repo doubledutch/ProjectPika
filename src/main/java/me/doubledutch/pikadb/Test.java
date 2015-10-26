@@ -15,7 +15,7 @@ public class Test{
 			PageFile f=new PageFile(filename);
 			Page p1=f.createPage();
 			p1.makeUnsortable();
-			Soup soup=new Soup("users",f,0);
+			Table soup=new Table("users",f,0);
 
 			for(int i=0;i<RECORDS;i++){
 				JSONObject obj=new JSONObject();
@@ -45,7 +45,7 @@ public class Test{
 			
 			// Do a quick warmup scan
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);
+			soup=new Table("users",f,0);
 			list=soup.scan();
 			list=null;
 			f.close();
@@ -55,7 +55,7 @@ public class Test{
 			System.out.println(" + Reading full objects - 100%");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);
+			soup=new Table("users",f,0);
 			list=soup.scan();
 			for(int i=0;i<RECORDS;i++){
 				JSONObject obj=list.get(i);
@@ -72,7 +72,7 @@ public class Test{
 			System.out.println(" + Reading full objects - 50%");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);
+			soup=new Table("users",f,0);
 			ObjectSet set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%2==0){
@@ -94,7 +94,7 @@ public class Test{
 			System.out.println(" + Reading full objects - 25%");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);
+			soup=new Table("users",f,0);
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%4==0){
@@ -116,7 +116,7 @@ public class Test{
 			System.out.println(" + Reading full objects - 5%");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);
+			soup=new Table("users",f,0);
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%20==0){
@@ -137,7 +137,7 @@ public class Test{
 			System.out.println(" + Reading full objects - 1%");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);
+			soup=new Table("users",f,0);
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%100==0){
@@ -158,7 +158,7 @@ public class Test{
 
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);		
+			soup=new Table("users",f,0);		
 			
 			System.out.println(" + Reading partial objects");
 			List<String> columns=new ArrayList<String>();
@@ -179,7 +179,7 @@ public class Test{
 			System.out.println(" + Reading a single object - early");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Soup("users",f,0);
+			soup=new Table("users",f,0);
 
 			JSONObject obj=soup.scan(3);
 			// System.out.println(obj.toString());

@@ -4,14 +4,14 @@ import java.io.*;
 import java.util.*;
 import org.json.*;
 
-public class Soup{
+public class Table{
 	private String name;
 	private PageFile pageFile;
 	private int rootPageId;
 	private Column metaData;
 	private Map<String,Column> columnMap;
 
-	public Soup(String name,PageFile pageFile,int rootPageId) throws IOException{
+	public Table(String name,PageFile pageFile,int rootPageId) throws IOException{
 		this.name=name;
 		this.pageFile=pageFile;
 		this.rootPageId=rootPageId;

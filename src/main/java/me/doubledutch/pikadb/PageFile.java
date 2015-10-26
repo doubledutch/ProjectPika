@@ -29,7 +29,7 @@ public class PageFile{
 	}
 
 
-	private void trimPageSet(int id){
+	protected void trimPageSet(int id){
 
 	}
 
