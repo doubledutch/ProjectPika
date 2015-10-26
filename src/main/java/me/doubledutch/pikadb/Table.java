@@ -33,11 +33,11 @@ public class Table{
 		columnMap=tmp;
 	}
 
-	public void declareColumn(String name,boolean sortable) throws IOException{
+	public void declareColumn(String name) throws IOException{
 
 	}
 
-	public void declareColumn(String name,boolean sortable,int type,boolean nullable,boolean required) throws IOException{
+	public void declareColumn(String name,int... constraints) throws IOException{
 		
 	}
 
