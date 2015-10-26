@@ -10,5 +10,15 @@ public class PikaDB{
 		
 	}
 
+	public Table getTable(String name) throws IOException{
+		return null;
+	}
 
+	public Table declareTable(String name) throws IOException{
+		return null;
+	}
+
+	public Table declareTable(String name,int constraint) throws IOException{
+		return null;
+	}
 }
