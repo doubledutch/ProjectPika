@@ -12,6 +12,8 @@ public class Test{
 			System.out.println(" + Writing "+RECORDS+" objects");
 
 			long pre=System.currentTimeMillis();
+			PikaDB db=new PikaDB(filename);
+
 			PageFile f=new PageFile(filename);
 			Page p1=f.createPage();
 			p1.makeUnsortable();

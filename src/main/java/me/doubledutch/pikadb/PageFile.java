@@ -18,13 +18,13 @@ public class PageFile{
 		File ftest=new File(filename+".wal");
 		if(ftest.exists()){
 			wal=new WriteAheadLog(filename+".wal");
-			recoverTransaction();
+			recoverTransactions();
 			ftest.delete();
 			wal=null;
 		}
 	}
 
-	private void recoverTransaction(){
+	protected void recoverTransactions(){
 		// Replay everything in the write ahead log
 	}
 
