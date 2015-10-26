@@ -32,3 +32,19 @@ while(cr.moveNext()){
 	String username=cr.getString(1);
 }
 ````
+
+## ORM
+
+```java
+@Table(name="Users")
+public class User {
+	@Column(required=true)
+    private int Id;
+    @Column(required=true)
+    private string FirstName;
+    @Column(required=true)
+    private string LastName;
+    @Column
+    private string ProfileURL
+}
+````
