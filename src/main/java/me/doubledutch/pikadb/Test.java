@@ -13,12 +13,7 @@ public class Test{
 
 			long pre=System.currentTimeMillis();
 			PikaDB db=new PikaDB(filename);
-
-			PageFile f=new PageFile(filename);
-			Page p1=f.createPage();
-			p1.makeUnsortable();
-			Table soup=new Table("users",f,0);
-
+			Table users=db.declareTable("users");
 			for(int i=0;i<RECORDS;i++){
 				JSONObject obj=new JSONObject();
 				obj.put("id",i);
@@ -27,11 +22,13 @@ public class Test{
 				obj.put("lastName","Jeppesen");
 				obj.put("image","jerk-"+i+".png");
 				// obj.put("number",3.1415f);
-				soup.add(i,obj);
+				users.add(i,obj);
 			}
-			f.saveChanges(true);
-			f.close();
-			f=null;
+			db.save();
+			db.close();
+			db=null;
+			// f.close();
+			// f=null;
 			
 			long post=System.currentTimeMillis();
 			System.out.println("   - Write in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
@@ -43,38 +40,49 @@ public class Test{
 
 			List<JSONObject> list=null;
 
+			// Do a quick warmup scan
+			db=new PikaDB(filename);
+			users=db.declareTable("users");
+			list=users.scan();
+			db.close();
+			list=null;
+			db=null;
+			System.gc();
+
+			System.out.println(" + Reading full objects - 100%");
+			pre=System.currentTimeMillis();
+			db=new PikaDB(filename);
+			users=db.declareTable("users");
+			list=users.scan();
+			for(int i=0;i<RECORDS;i++){
+				JSONObject obj=list.get(i);
+				// System.out.println(obj.toString());
+			}
+			db.close();
+			db=null;
+			post=System.currentTimeMillis();
+			System.out.println("   - Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
+			System.gc();
 
 			
+			/*
 			// Do a quick warmup scan
 			f=new PageFile(filename);
-			soup=new Table("users",f,0);
+			soup=new Table("users",f,0,false);
 			list=soup.scan();
 			list=null;
 			f.close();
 			f=null;
 			System.gc();
 
-			System.out.println(" + Reading full objects - 100%");
-			pre=System.currentTimeMillis();
-			f=new PageFile(filename);
-			soup=new Table("users",f,0);
-			list=soup.scan();
-			for(int i=0;i<RECORDS;i++){
-				JSONObject obj=list.get(i);
-				// System.out.println(obj.toString());
-			}
-			f.close();
-			f=null;
-			post=System.currentTimeMillis();
-			System.out.println("   - Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
-			System.gc();
+			
 
 			
 			
 			System.out.println(" + Reading full objects - 50%");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Table("users",f,0);
+			soup=new Table("users",f,0,false);
 			ObjectSet set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%2==0){
@@ -96,7 +104,7 @@ public class Test{
 			System.out.println(" + Reading full objects - 25%");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Table("users",f,0);
+			soup=new Table("users",f,0,false);
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%4==0){
@@ -118,7 +126,7 @@ public class Test{
 			System.out.println(" + Reading full objects - 5%");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Table("users",f,0);
+			soup=new Table("users",f,0,false);
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%20==0){
@@ -139,7 +147,7 @@ public class Test{
 			System.out.println(" + Reading full objects - 1%");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Table("users",f,0);
+			soup=new Table("users",f,0,false);
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%100==0){
@@ -160,7 +168,7 @@ public class Test{
 
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Table("users",f,0);		
+			soup=new Table("users",f,0,false);		
 			
 			System.out.println(" + Reading partial objects");
 			List<String> columns=new ArrayList<String>();
@@ -181,7 +189,7 @@ public class Test{
 			System.out.println(" + Reading a single object - early");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);
-			soup=new Table("users",f,0);
+			soup=new Table("users",f,0,false);
 
 			JSONObject obj=soup.scan(3);
 			// System.out.println(obj.toString());
@@ -232,13 +240,14 @@ public class Test{
 			// System.out.println(obj);
 
 			f.close();
-			
+			*/
 			/*
 			System.out.println("1 = "+MurmurHash3.hashInt(1337,1));
 			System.out.println("2 = "+MurmurHash3.hashInt(1337,2));
 			System.out.println("3 = "+MurmurHash3.hashInt(1337,3));
 			System.out.println("1000 = "+MurmurHash3.hashInt(1337,1000));
 			*/
+
 		}catch(Exception e){
 			e.printStackTrace();
 		}

@@ -11,12 +11,16 @@ public class Table{
 	private Column metaData;
 	private Map<String,Column> columnMap;
 
-	public Table(String name,PageFile pageFile,int rootPageId) throws IOException{
+	public Table(String name,PageFile pageFile,int rootPageId,boolean preserve_order) throws IOException{
 		this.name=name;
 		this.pageFile=pageFile;
 		this.rootPageId=rootPageId;
 		metaData=new Column(pageFile,rootPageId,false);
 		loadColumns();
+	}
+
+	protected void enforceConstraints(int... constraints) throws IOException{
+		// TODO: Implement
 	}
 
 	private void loadColumns() throws IOException{
