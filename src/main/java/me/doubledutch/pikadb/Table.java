@@ -4,19 +4,23 @@ import java.io.*;
 import java.util.*;
 import org.json.*;
 
-public class Soup{
+public class Table{
 	private String name;
 	private PageFile pageFile;
 	private int rootPageId;
 	private Column metaData;
 	private Map<String,Column> columnMap;
 
-	public Soup(String name,PageFile pageFile,int rootPageId) throws IOException{
+	public Table(String name,PageFile pageFile,int rootPageId,boolean preserve_order) throws IOException{
 		this.name=name;
 		this.pageFile=pageFile;
 		this.rootPageId=rootPageId;
 		metaData=new Column(pageFile,rootPageId,false);
 		loadColumns();
+	}
+
+	protected void enforceConstraints(int... constraints) throws IOException{
+		// TODO: Implement
 	}
 
 	private void loadColumns() throws IOException{
@@ -33,11 +37,11 @@ public class Soup{
 		columnMap=tmp;
 	}
 
-	public void declareColumn(String name,boolean sortable) throws IOException{
+	public void declareColumn(String name) throws IOException{
 
 	}
 
-	public void declareColumn(String name,boolean sortable,int type,boolean nullable,boolean required) throws IOException{
+	public void declareColumn(String name,int... constraints) throws IOException{
 		
 	}
 
