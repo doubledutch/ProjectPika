@@ -16,8 +16,10 @@ public class ObjectSet{
 	}
 
 	public boolean anyObjectsInBloomFilter(int bloomfilter){
+		// TODO: look into maintaining a separate set of hashed oid's
 		for(int oid:oidSet){
-			if((oid & bloomfilter) == oid){
+			int hoid=MurmurHash3.getSelectiveBits(oid);
+			if((hoid & bloomfilter) == hoid){
 				return true;
 			}
 		}

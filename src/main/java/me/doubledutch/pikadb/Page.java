@@ -9,8 +9,8 @@ public class Page{
 	public static int UNSORTABLE=2;
 
 	public final static int HEADER=4+4+4+1; // nextPageId + currentFill + bloomFilter + type
-	public final static int PAYLOAD=4096-HEADER-16;
-	public final static int SIZE=PAYLOAD+HEADER+16;
+	public final static int PAYLOAD=4096-HEADER-32;
+	public final static int SIZE=PAYLOAD+HEADER+32;
 	// TODO: add stop byte after data payload when creating and updating the file
 	// TODO: fix the EOF errors requiring -16
 
