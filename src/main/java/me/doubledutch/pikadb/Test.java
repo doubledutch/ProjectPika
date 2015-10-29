@@ -183,12 +183,15 @@ public class Test{
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/1000)/((post-pre)/1000.0))+" obj/s");
 			
-			System.out.println(" + Reading single objects");
+			System.out.println(" + Reading single objects (bloom test)");
 			
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
+			// Prescan last to exercise bloom and not io
+			JSONObject obj=users.scan(RECORDS-2);
+
 			pre=System.currentTimeMillis();
-			JSONObject obj=users.scan(1);
+			obj=users.scan(1);
 			post=System.currentTimeMillis();
 			System.out.println("   - Read early object in "+(post-pre)+"ms");
 			pre=System.currentTimeMillis();
