@@ -96,25 +96,15 @@ public class Page{
 		type=pageFile.readByte();
 	}
 
-	private int bitsForBloomFilter(int oid){
-		int h1=MurmurHash3.hashInt(0,oid);
-		int h2=MurmurHash3.hashInt(h1,oid);
-		// 5 seems to be the magic recommended number for this
-		int bits=0;
-		for(int i=0;i<5;i++){
-			int m=Math.abs((h1+i*h2)%32);
-			bits|=1<<m;
-		}
-		return bits;
-	}
+	
 
 	public void addToBloomFilter(int oid){
-		int bits=bitsForBloomFilter(oid);
+		int bits=MurmurHash3.getSelectiveBits(oid);
 		bloomfilter=bloomfilter | bits;
 	}
 
 	public boolean isInBloomFilter(int oid){
-		int bits=bitsForBloomFilter(oid);
+		int bits=MurmurHash3.getSelectiveBits(oid);
 		return (bloomfilter & bits) == bits;
 	}
 
