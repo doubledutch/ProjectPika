@@ -92,36 +92,36 @@ public class Table{
         }
 	}
 
-	public List<JSONObject> scan() throws IOException,JSONException{
+	public ResultSet scan() throws IOException,JSONException{
 		return scan(columnMap.keySet());
 	}
 
-	public List<JSONObject> scan(Collection<String> columns) throws IOException,JSONException{
+	public ResultSet scan(Collection<String> columns) throws IOException,JSONException{
 		ObjectSet set=new ObjectSet(true);
 		return scan(set,columns);
 	}
 
-	public JSONObject scan(int oid)  throws IOException,JSONException{
+	public ResultSet scan(int oid)  throws IOException,JSONException{
 		return scan(oid,columnMap.keySet());
 	}
 
-	public JSONObject scan(int oid,Collection<String> columns)  throws IOException,JSONException{
+	public ResultSet scan(int oid,Collection<String> columns)  throws IOException,JSONException{
 		ObjectSet set=new ObjectSet(false);
         set.addOID(oid);
-        scan(set,columns);
-        JSONObject obj=set.getObject(oid);
+        return scan(set,columns);
+        /*JSONObject obj=set.getObject(oid);
         Iterator<String> it=obj.keys();
         if(!it.hasNext()){
             return null;
-        }
-        return obj;
+        }*/
 	}
 
-	public List<JSONObject> scan(ObjectSet set) throws IOException,JSONException{
+	public ResultSet scan(ObjectSet set) throws IOException,JSONException{
 		return scan(set,columnMap.keySet());
 	}
 
-	public List<JSONObject> scan(ObjectSet set,Collection<String> columns) throws IOException,JSONException{
+	public ResultSet scan(ObjectSet set,Collection<String> columns) throws IOException,JSONException{
+		ResultSet result=new ResultSet();
 		for(String columnName:columns){
 			Column col=columnMap.get(columnName);
 			List<Variant> list=col.scan(set);
