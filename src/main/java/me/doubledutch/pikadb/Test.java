@@ -11,9 +11,10 @@ public class Test{
 		try{	
 			System.out.println(" + Writing "+RECORDS+" objects");
 
-			long pre=System.currentTimeMillis();
+			
 			PikaDB db=new PikaDB(filename);
 			Table users=db.declareTable("users");
+			long pre=System.currentTimeMillis();
 			for(int i=0;i<RECORDS;i++){
 				JSONObject obj=new JSONObject();
 				obj.put("id",i);
@@ -50,9 +51,10 @@ public class Test{
 			System.gc();
 
 			System.out.println(" + Reading full objects - 100%");
-			pre=System.currentTimeMillis();
+			
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
+			pre=System.currentTimeMillis();
 			list=users.scan();
 			for(int i=0;i<RECORDS;i++){
 				JSONObject obj=list.get(i);
@@ -70,9 +72,10 @@ public class Test{
 			System.gc();
 
 			System.out.println(" + Reading full objects - 50%");
-			pre=System.currentTimeMillis();
+			
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
+			pre=System.currentTimeMillis();
 			ObjectSet set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%2==0){
@@ -92,9 +95,10 @@ public class Test{
 			
 
 			System.out.println(" + Reading full objects - 25%");
-			pre=System.currentTimeMillis();
+			
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
+			pre=System.currentTimeMillis();
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%4==0){
@@ -113,9 +117,10 @@ public class Test{
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/4)/((post-pre)/1000.0))+" obj/s");
 			
 			System.out.println(" + Reading full objects - 5%");
-			pre=System.currentTimeMillis();
+			
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
+			pre=System.currentTimeMillis();
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%20==0){
@@ -134,9 +139,10 @@ public class Test{
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/20)/((post-pre)/1000.0))+" obj/s");
 			
 			System.out.println(" + Reading full objects - 1%");
-			pre=System.currentTimeMillis();
+			
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
+			pre=System.currentTimeMillis();
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%100==0){
@@ -156,9 +162,10 @@ public class Test{
 			
 
 			System.out.println(" + Reading full objects - 0.1%");
-			pre=System.currentTimeMillis();
+			
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
+			pre=System.currentTimeMillis();
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%1000==0){
@@ -176,6 +183,24 @@ public class Test{
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/1000)/((post-pre)/1000.0))+" obj/s");
 			
+			System.out.println(" + Reading single objects");
+			
+			db=new PikaDB(filename);
+			users=db.declareTable("users");
+			pre=System.currentTimeMillis();
+			JSONObject obj=users.scan(1);
+			post=System.currentTimeMillis();
+			System.out.println("   - Read early object in "+(post-pre)+"ms");
+			pre=System.currentTimeMillis();
+			obj=users.scan(RECORDS/2);
+			post=System.currentTimeMillis();
+			System.out.println("   - Read mid object in "+(post-pre)+"ms");
+			pre=System.currentTimeMillis();
+			obj=users.scan(RECORDS-2);
+			post=System.currentTimeMillis();
+			System.out.println("   - Read late object in "+(post-pre)+"ms");
+			db.close();
+			db=null;
 			
 			/*
 
