@@ -57,6 +57,11 @@ public class Test{
 			for(int i=0;i<RECORDS;i++){
 				JSONObject obj=list.get(i);
 				// System.out.println(obj.toString());
+				if(obj.getInt("id")!=i){
+					System.out.println("   - Data error!! at "+i);
+					System.out.println(obj.toString());
+					System.exit(0);
+				}
 			}
 			db.close();
 			db=null;
@@ -66,19 +71,7 @@ public class Test{
 
 			
 			/*
-			// Do a quick warmup scan
-			f=new PageFile(filename);
-			soup=new Table("users",f,0,false);
-			list=soup.scan();
-			list=null;
-			f.close();
-			f=null;
-			System.gc();
 
-			
-
-			
-			
 			System.out.println(" + Reading full objects - 50%");
 			pre=System.currentTimeMillis();
 			f=new PageFile(filename);

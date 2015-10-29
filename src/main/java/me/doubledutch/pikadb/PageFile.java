@@ -69,7 +69,7 @@ public class PageFile{
 		for(Page page:pageMap.values()){
 			if(page.isDirty() && page.getFillRatio()>0.5  && sort){ // TODO: figure out the right threshold
 				page.flatten();
-				Column.sort(page);
+				// Column.sort(page);
 			}
 		 	page.commitChanges(wal);
 		}

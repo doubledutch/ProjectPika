@@ -5,7 +5,7 @@ import org.json.*;
 
 public class ObjectSet{
 	private Map<String,Map<Integer,Variant>> columnValueMap=new HashMap<String,Map<Integer,Variant>>();
-	private Set<Integer> oidSet=new HashSet<Integer>();
+	private Set<Integer> oidSet=new LinkedHashSet<Integer>();
 
 	private boolean open;
 	private int matchCounter;
