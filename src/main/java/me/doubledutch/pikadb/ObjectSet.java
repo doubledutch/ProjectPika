@@ -6,6 +6,7 @@ import org.json.*;
 public class ObjectSet{
 	private Map<String,Map<Integer,Variant>> columnValueMap=new HashMap<String,Map<Integer,Variant>>();
 	private Set<Integer> oidSet=new LinkedHashSet<Integer>();
+	// TODO: Check performance implications of using linked hash set
 
 	private boolean open;
 	private int matchCounter;
