@@ -69,13 +69,10 @@ public class Test{
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
 			System.gc();
 
-			
-			/*
-
 			System.out.println(" + Reading full objects - 50%");
 			pre=System.currentTimeMillis();
-			f=new PageFile(filename);
-			soup=new Table("users",f,0,false);
+			db=new PikaDB(filename);
+			users=db.declareTable("users");
 			ObjectSet set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%2==0){
@@ -83,21 +80,21 @@ public class Test{
 					
 				}
 			}
-			list=soup.scan(set);
+			list=users.scan(set);
 			for(int i=0;i<list.size();i++){
 				JSONObject obj=list.get(i);
 				// System.out.println(obj.toString());
 			}
-			f.close();
-			f=null;
+			db.close();
+			db=null;
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/2)/((post-pre)/1000.0))+" obj/s");
 			
 
 			System.out.println(" + Reading full objects - 25%");
 			pre=System.currentTimeMillis();
-			f=new PageFile(filename);
-			soup=new Table("users",f,0,false);
+			db=new PikaDB(filename);
+			users=db.declareTable("users");
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%4==0){
@@ -105,21 +102,20 @@ public class Test{
 					
 				}
 			}
-			list=soup.scan(set);
+			list=users.scan(set);
 			for(int i=0;i<list.size();i++){
 				JSONObject obj=list.get(i);
 				// System.out.println(obj.toString());
 			}
-			f.close();
-			f=null;
+			db.close();
+			db=null;
 			post=System.currentTimeMillis();
-			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/2)/((post-pre)/1000.0))+" obj/s");
+			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/4)/((post-pre)/1000.0))+" obj/s");
 			
-
 			System.out.println(" + Reading full objects - 5%");
 			pre=System.currentTimeMillis();
-			f=new PageFile(filename);
-			soup=new Table("users",f,0,false);
+			db=new PikaDB(filename);
+			users=db.declareTable("users");
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%20==0){
@@ -127,20 +123,20 @@ public class Test{
 					
 				}
 			}
-			list=soup.scan(set);
+			list=users.scan(set);
 			for(int i=0;i<list.size();i++){
 				JSONObject obj=list.get(i);
 				// System.out.println(obj.toString());
 			}
-			f.close();
-			f=null;
+			db.close();
+			db=null;
 			post=System.currentTimeMillis();
-			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/2)/((post-pre)/1000.0))+" obj/s");
+			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/20)/((post-pre)/1000.0))+" obj/s");
 			
 			System.out.println(" + Reading full objects - 1%");
 			pre=System.currentTimeMillis();
-			f=new PageFile(filename);
-			soup=new Table("users",f,0,false);
+			db=new PikaDB(filename);
+			users=db.declareTable("users");
 			set=new ObjectSet(false);
 			for(int i=0;i<RECORDS;i++){
 				if(i%100==0){
@@ -148,15 +144,20 @@ public class Test{
 					
 				}
 			}
-			list=soup.scan(set);
+			list=users.scan(set);
 			for(int i=0;i<list.size();i++){
 				JSONObject obj=list.get(i);
 				// System.out.println(obj.toString());
 			}
-			f.close();
-			f=null;
+			db.close();
+			db=null;
 			post=System.currentTimeMillis();
-			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/2)/((post-pre)/1000.0))+" obj/s");
+			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/100)/((post-pre)/1000.0))+" obj/s");
+			
+			
+			/*
+
+
 			
 
 			pre=System.currentTimeMillis();
