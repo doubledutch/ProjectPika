@@ -154,6 +154,28 @@ public class Test{
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/100)/((post-pre)/1000.0))+" obj/s");
 			
+
+			System.out.println(" + Reading full objects - 0.1%");
+			pre=System.currentTimeMillis();
+			db=new PikaDB(filename);
+			users=db.declareTable("users");
+			set=new ObjectSet(false);
+			for(int i=0;i<RECORDS;i++){
+				if(i%1000==0){
+					set.addOID(i);
+					
+				}
+			}
+			list=users.scan(set);
+			for(int i=0;i<list.size();i++){
+				JSONObject obj=list.get(i);
+				// System.out.println(obj.toString());
+			}
+			db.close();
+			db=null;
+			post=System.currentTimeMillis();
+			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/1000)/((post-pre)/1000.0))+" obj/s");
+			
 			
 			/*
 
