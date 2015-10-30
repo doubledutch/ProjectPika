@@ -8,9 +8,9 @@ public class Page{
 	public static int SORTED=1;
 	public static int UNSORTABLE=2;
 
-	public final static int HEADER=4+4+8+1; // nextPageId + currentFill + bloomFilter + type
-	public final static int PAYLOAD=2048-HEADER-64;
-	public final static int SIZE=PAYLOAD+HEADER+64;
+	public final static int HEADER=4+4+8+1+1; // nextPageId + currentFill + bloomFilter + type + end of page marker
+	public final static int PAYLOAD=1024-HEADER;
+	public final static int SIZE=PAYLOAD+HEADER;
 	// TODO: add stop byte after data payload when creating and updating the file
 	// TODO: fix the EOF errors requiring -16
 
@@ -74,8 +74,8 @@ public class Page{
 	private void loadRawData() throws IOException{
 		if(rawData==null){
 			pageHandler.trimPageSet(id);
-			rawData=new byte[PAYLOAD];
-			pageFile.seek(offset+HEADER);
+			rawData=new byte[PAYLOAD+1]; // Add stop marker
+			pageFile.seek(offset+HEADER-1);
 			pageFile.readFully(rawData);
 		}
 	}
@@ -163,7 +163,7 @@ public class Page{
 		}
 		loadRawData();
 		flatten();
-		pageFile.seek(offset+HEADER);
+		pageFile.seek(offset+HEADER-1); // move back from page stop marker
 		pageFile.write(rawData);
 		saveMetaData();
 		dirty=false;
