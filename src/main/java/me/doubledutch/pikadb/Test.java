@@ -21,7 +21,7 @@ public class Test{
 			long pre=System.currentTimeMillis();
 			for(int i=0;i<RECORDS;i++){
 				JSONObject obj=new JSONObject();
-				obj.put("id",i);
+				obj.put("id",java.util.UUID.randomUUID().toString());
 				obj.put("username","kasper.jeppesen"+i);
 				obj.put("firstName","Kasper");
 				obj.put("lastName","Jeppesen");
@@ -271,12 +271,6 @@ public class Test{
 			// System.out.println(obj);
 
 			f.close();
-			*/
-			/*
-			System.out.println("1 = "+MurmurHash3.hashInt(1337,1));
-			System.out.println("2 = "+MurmurHash3.hashInt(1337,2));
-			System.out.println("3 = "+MurmurHash3.hashInt(1337,3));
-			System.out.println("1000 = "+MurmurHash3.hashInt(1337,1000));
 			*/
 
 		}catch(Exception e){
