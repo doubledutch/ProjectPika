@@ -48,7 +48,7 @@ public class Test{
 			// Do a quick warmup scan
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
-			list=users.scan();
+			list=users.select().execute();
 			db.close();
 			list=null;
 			db=null;
@@ -59,7 +59,7 @@ public class Test{
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
 			pre=System.currentTimeMillis();
-			list=users.scan();
+			list=users.select().execute();
 			/*for(int i=0;i<RECORDS;i++){
 				JSONObject obj=list.get(i);
 				// System.out.println(obj.toString());

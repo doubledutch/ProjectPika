@@ -101,19 +101,19 @@ public class Table{
 	}
 
 	public ResultSet scan() throws IOException,JSONException{
-		return scan(columnMap.keySet());
+		return scan(columnMap.keySet().toArray(new String[0]));
 	}
 
-	public ResultSet scan(Collection<String> columns) throws IOException,JSONException{
+	public ResultSet scan(String[] columns) throws IOException,JSONException{
 		ObjectSet set=new ObjectSet(true);
 		return scan(set,columns);
 	}
 
 	public ResultSet scan(int oid)  throws IOException,JSONException{
-		return scan(oid,columnMap.keySet());
+		return scan(oid,columnMap.keySet().toArray(new String[0]));
 	}
 
-	public ResultSet scan(int oid,Collection<String> columns)  throws IOException,JSONException{
+	public ResultSet scan(int oid,String[] columns)  throws IOException,JSONException{
 		ObjectSet set=new ObjectSet(false);
         set.addOID(oid);
         return scan(set,columns);
@@ -125,10 +125,10 @@ public class Table{
 	}
 
 	public ResultSet scan(ObjectSet set) throws IOException,JSONException{
-		return scan(set,columnMap.keySet());
+		return scan(set,columnMap.keySet().toArray(new String[0]));
 	}
 
-	public ResultSet scan(ObjectSet set,Collection<String> columns) throws IOException,JSONException{
+	public ResultSet scan(ObjectSet set,String[] columns) throws IOException,JSONException{
 		ResultSet result=new ResultSet();
 		result.startTimer();
 		for(String columnName:columns){
