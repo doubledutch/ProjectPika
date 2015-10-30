@@ -17,8 +17,6 @@ The project was named after the American Pika. While we need a solid simple bran
 
 ## 2. Refactoring
 
-The current datamodel is Database > Soup > Column > Value. While the concept of a soup perfectly matches what we are trying to do, it is foreign and creates initial confusion to people interested in the project - just change it to Table.
-
 The current jar file is not directly usable by an Android Studio project. There is not reason for this - figure out why this is a problem and fixe the project to build artifacts that can be instantly used for both Android and general Java projects.
 
 There is currently a half assed implementation of sorted pages - make it work in general and make non sortable columns be something that can be configured using the database declaration API.
@@ -28,8 +26,6 @@ There is currently a half assed implementation of sorted pages - make it work in
 There is a current pull request for a simple LRU based page replacement algorithm - extend this to include a LRU 2Q algorithm.
 
 The current implementation can fail if it is stopped in the middle of a write. The plan for this is to implement a write ahead log with checkpoints. 
-
-There are serious issues with page overflows - this is a high priority issue to debug!
 
 Add support for null values, timestamps and bignums!
 
