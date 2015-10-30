@@ -6,6 +6,10 @@ import org.json.*;
 
 public class Test{
 	public static void main(String args[]){
+		/*for(int l=0;l<20;l++){
+			System.out.println(Long.toBinaryString(MurmurHash3.getSelectiveBits(l))+", ");
+		}
+		if(true)return;*/
 		String filename="./test.data";
 		int RECORDS=100000;
 		try{	

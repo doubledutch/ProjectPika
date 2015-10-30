@@ -21,9 +21,9 @@ final class MurmurHash3 {
     int h2=hashInt(h1,oid);
     // 5 seems to be the magic recommended number for this
     long bits=0;
-    for(int i=0;i<5;i++){
-      long m=Math.abs((h1+i*h2)%64);
-      bits|=1<<m;
+    for(int i=0;i<1;i++){
+      int m=Math.abs(h1+i*h2)%64;
+      bits|=1l<<m;
     }
     return bits;
   }
