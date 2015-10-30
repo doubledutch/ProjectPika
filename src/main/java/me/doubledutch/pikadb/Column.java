@@ -8,8 +8,10 @@ public class Column{
 	public int rootId;
 	private int knownFreePageId;
 	private boolean sortable;
+	private String name;
 
-	public Column(PageFile pageFile,int rootId,boolean sortable){
+	public Column(String name,PageFile pageFile,int rootId,boolean sortable){
+		this.name=name;
 		this.pageFile=pageFile;
 		this.rootId=rootId;
 		knownFreePageId=rootId;
@@ -60,37 +62,42 @@ public class Column{
 		return page;
 	}
 
-	protected static List<Variant> scan(Page page,ObjectSet set) throws IOException{
-		List<Variant> list=new ArrayList<Variant>();
+	protected static void scan(ColumnResult result,Page page,ObjectSet set) throws IOException{
+		result.incPageScanned();
 		DataInput in=page.getDataInput();
 		Variant v=Variant.readVariant(in,set);
 		while(v!=null){
+			result.incVariantRead();
 			if(v.getType()!=Variant.SKIP){
-				list.add(v);
+				result.add(v);
 				if(!set.isOpen()){
 					if(set.getMatchCount()==set.getCount()){
-						return list;
+						return;
 					}
 				}
 			}
 			v=Variant.readVariant(in,set);
 		}
-		return list;
+		return;
 	}
 
-	public List<Variant> scan(ObjectSet set) throws IOException{
+	public ColumnResult scan(ObjectSet set) throws IOException{
 		set.resetMatchCounter();
-		List<Variant> list=new ArrayList<Variant>();
+		ColumnResult result=new ColumnResult(name);
+		result.startTimer();
 		Page page=pageFile.getPage(rootId);
 		while(page!=null){
 			if((!set.isOpen()) && set.anyObjectsInBloomFilter(page.getBloomFilter())){
-				list.addAll(scan(page,set));
+				scan(result,page,set);
 			}else if(set.isOpen()){
-				list.addAll(scan(page,set));
+				scan(result,page,set);
+			}else{
+				result.incPageSkipped();
 			}
 			if(!set.isOpen()){
 				if(set.getMatchCount()==set.getCount()){
-					return list;
+					result.endTimer();
+					return result;
 				}
 			}
 			int next=page.getNextPageId();
@@ -100,12 +107,15 @@ public class Column{
 				page=null;
 			}
 		}
-		return list;
+		result.endTimer();
+		return result;
 	}
 
 	public static void sort(Page page) throws IOException{
 		ObjectSet set=new ObjectSet(true);
-		List<Variant> list=scan(page,set);	
+		ColumnResult result=new ColumnResult("");
+		scan(result,page,set);
+		List<Variant> list=result.getVariantList();	
 		Collections.sort(list);	
 		Variant last=list.remove(list.size()-1);
 		list.add(0,last);

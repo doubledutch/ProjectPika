@@ -30,7 +30,8 @@ public class PikaDB{
 		systemSettings=new Table("_pikadb.system",pageFile,0,true);
 		systemTableList=new Table("_pikadb.tables",pageFile,1,true);
 		tableMap=new HashMap<String,Table>();
-		List<JSONObject> list=systemTableList.scan();
+		ResultSet result=systemTableList.scan();
+		List<JSONObject> list=result.getObjectList();
 		nextTableOID=list.size();
 		for(JSONObject obj:list){
 			Table table=new Table(obj.getString("name"),pageFile,obj.getInt("root"),obj.getBoolean("preserve_order"));

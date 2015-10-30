@@ -8,9 +8,9 @@ public class Page{
 	public static int SORTED=1;
 	public static int UNSORTABLE=2;
 
-	public final static int HEADER=4+4+4+1; // nextPageId + currentFill + bloomFilter + type
-	public final static int PAYLOAD=4096-HEADER-32;
-	public final static int SIZE=PAYLOAD+HEADER+32;
+	public final static int HEADER=4+4+8+1; // nextPageId + currentFill + bloomFilter + type
+	public final static int PAYLOAD=2048-HEADER-64;
+	public final static int SIZE=PAYLOAD+HEADER+64;
 	// TODO: add stop byte after data payload when creating and updating the file
 	// TODO: fix the EOF errors requiring -16
 
@@ -20,7 +20,7 @@ public class Page{
 	private byte[] rawData;
 	private int currentFill=0;
 	private int nextPageId=-1;
-	private int bloomfilter=0;
+	private long bloomfilter=0;
 	private int type=UNSORTED;
 
 	private PageFile pageHandler;
@@ -84,7 +84,7 @@ public class Page{
 		pageFile.seek(offset);
 		pageFile.writeInt(nextPageId);
 		pageFile.writeInt(currentFill);
-		pageFile.writeInt(bloomfilter);
+		pageFile.writeLong(bloomfilter);
 		pageFile.writeByte(type);
 	}
 
@@ -92,23 +92,23 @@ public class Page{
 		pageFile.seek(offset);
 		nextPageId=pageFile.readInt();
 		currentFill=pageFile.readInt();
-		bloomfilter=pageFile.readInt();
+		bloomfilter=pageFile.readLong();
 		type=pageFile.readByte();
 	}
 
 	
 
 	public void addToBloomFilter(int oid){
-		int bits=MurmurHash3.getSelectiveBits(oid);
+		long bits=MurmurHash3.getSelectiveBits(oid);
 		bloomfilter=bloomfilter | bits;
 	}
 
 	public boolean isInBloomFilter(int oid){
-		int bits=MurmurHash3.getSelectiveBits(oid);
+		long bits=MurmurHash3.getSelectiveBits(oid);
 		return (bloomfilter & bits) == bits;
 	}
 
-	public int getBloomFilter(){
+	public long getBloomFilter(){
 		return bloomfilter;
 	}
 

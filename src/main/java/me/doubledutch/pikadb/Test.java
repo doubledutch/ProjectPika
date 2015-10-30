@@ -39,7 +39,7 @@ public class Test{
 			File ftest=new File(filename);
 			System.out.println("   - Database size : "+(ftest.length()/1024)+"kb");
 
-			List<JSONObject> list=null;
+			ResultSet list=null;
 
 			// Do a quick warmup scan
 			db=new PikaDB(filename);
@@ -56,7 +56,7 @@ public class Test{
 			users=db.declareTable("users");
 			pre=System.currentTimeMillis();
 			list=users.scan();
-			for(int i=0;i<RECORDS;i++){
+			/*for(int i=0;i<RECORDS;i++){
 				JSONObject obj=list.get(i);
 				// System.out.println(obj.toString());
 				if(obj.getInt("id")!=i){
@@ -64,7 +64,7 @@ public class Test{
 					System.out.println(obj.toString());
 					System.exit(0);
 				}
-			}
+			}*/
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
@@ -84,10 +84,6 @@ public class Test{
 				}
 			}
 			list=users.scan(set);
-			for(int i=0;i<list.size();i++){
-				JSONObject obj=list.get(i);
-				// System.out.println(obj.toString());
-			}
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
@@ -107,10 +103,6 @@ public class Test{
 				}
 			}
 			list=users.scan(set);
-			for(int i=0;i<list.size();i++){
-				JSONObject obj=list.get(i);
-				// System.out.println(obj.toString());
-			}
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
@@ -129,10 +121,6 @@ public class Test{
 				}
 			}
 			list=users.scan(set);
-			for(int i=0;i<list.size();i++){
-				JSONObject obj=list.get(i);
-				// System.out.println(obj.toString());
-			}
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
@@ -151,10 +139,6 @@ public class Test{
 				}
 			}
 			list=users.scan(set);
-			for(int i=0;i<list.size();i++){
-				JSONObject obj=list.get(i);
-				// System.out.println(obj.toString());
-			}
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
@@ -174,10 +158,6 @@ public class Test{
 				}
 			}
 			list=users.scan(set);
-			for(int i=0;i<list.size();i++){
-				JSONObject obj=list.get(i);
-				// System.out.println(obj.toString());
-			}
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
@@ -188,20 +168,23 @@ public class Test{
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
 			// Prescan last to exercise bloom and not io
-			JSONObject obj=users.scan(RECORDS-2);
+			ResultSet obj=users.scan(RECORDS-2);
 
 			pre=System.currentTimeMillis();
 			obj=users.scan(1);
 			post=System.currentTimeMillis();
 			System.out.println("   - Read early object in "+(post-pre)+"ms");
+			System.out.println(obj.getExecutionPlan().toString());
 			pre=System.currentTimeMillis();
 			obj=users.scan(RECORDS/2);
 			post=System.currentTimeMillis();
 			System.out.println("   - Read mid object in "+(post-pre)+"ms");
+			System.out.println(obj.getExecutionPlan().toString());
 			pre=System.currentTimeMillis();
 			obj=users.scan(RECORDS-2);
 			post=System.currentTimeMillis();
 			System.out.println("   - Read late object in "+(post-pre)+"ms");
+			System.out.println(obj.getExecutionPlan().toString());
 			db.close();
 			db=null;
 			
