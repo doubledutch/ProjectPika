@@ -3,43 +3,75 @@ package me.doubledutch.pikadb.query;
 import me.doubledutch.pikadb.Variant;
 
 public class Predicate{
-	private static final int EQUALS=0;
-	private static final int LESSTHAN=1;
-	private static final int GREATERTHAN=2;
-	private static final int LIKE=3;
-	private static final int ISNULL=4;
-	private static final int OR=5;
-	private static final int AND=6;
-	private static final int NOT=7;
+	protected static final int EQUALS=0;
+	protected static final int LESSTHAN=1;
+	protected static final int GREATERTHAN=2;
+	protected static final int LIKE=3;
+	protected static final int ISNULL=4;
+	protected static final int OR=5;
+	protected static final int AND=6;
+	protected static final int NOT=7;
+	protected static final int WHERE=8;
 
+	private Query query;
+	private String column;
 	private Variant value=null;
+	private String pattern=null;
 	private int type;
 	private Predicate leftChild=null;
 	private Predicate rightChild=null;
 
-	public Predicate(int type,Variant value,Predicate left,Predicate right){
+	protected Predicate(Query query,String column){
+		this.column=column;
+		this.type=WHERE;
+		this.query=query;
+	}
+
+	protected Predicate(Query query,int type,Variant value){
 		this.type=type;
+		this.query=query;
 		this.value=value;
-		this.leftChild=left;
-		this.rightChild=right;
 	}
 
-	public static Predicate equalTo(Variant v){
-		return new Predicate(EQUALS,v,null,null);
+	protected Predicate(Query query,int type,String value){
+		this.type=type;
+		this.query=query;
+		this.pattern=value;
 	}
 
-	public static Predicate lessThan(Variant v){
-		return new Predicate(LESSTHAN,v,null,null);
+	protected int getType(){
+		return type;
 	}
 
-	public static Predicate greaterThan(Variant v){
-		return new Predicate(GREATERTHAN,v,null,null);
+	public Predicate equalTo(Variant v){
+		Predicate p=Predicate(query,EQUALS,v);
+		leftChild=p;
+		return p;
+		// TODO: check that this can only be created on a where predicate
 	}
 
-	public static Predicate like(Variant v){
-		return new Predicate(LIKE,v,null,null);
+	public Predicate lessThan(Variant v){
+		Predicate p=Predicate(query,LESSTHAN,v);
+		leftChild=p;
+		return p;
+		// TODO: check that this can only be created on a where predicate
 	}
 
+	public Predicate greaterThan(Variant v){
+		Predicate p=Predicate(query,GREATERTHAN,v);
+		leftChild=p;
+		return p;
+		// TODO: check that this can only be created on a where predicate
+	}
+
+	public Predicate like(String str){
+		Predicate p=Predicate(query,LIKE,str);
+		leftChild=p;
+		return p;
+		// TODO: check that this can only be created on a where predicate
+	}
+
+/*
 	public static Predicate isNull(){
 		return new Predicate(ISNULL,null,null,null);
 	}
@@ -62,5 +94,5 @@ public class Predicate{
 			case OR:return leftChild.testVariant(v) || rightChild.testVariant(v);
 		}
 		return false;
-	}
+	}*/
 }
