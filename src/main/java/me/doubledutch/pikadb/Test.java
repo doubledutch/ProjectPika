@@ -174,14 +174,17 @@ public class Test{
 			obj=users.scan(1);
 			post=System.currentTimeMillis();
 			System.out.println("   - Read early object in "+(post-pre)+"ms");
+			System.out.println(obj.getExecutionPlan().toString());
 			pre=System.currentTimeMillis();
 			obj=users.scan(RECORDS/2);
 			post=System.currentTimeMillis();
 			System.out.println("   - Read mid object in "+(post-pre)+"ms");
+			System.out.println(obj.getExecutionPlan().toString());
 			pre=System.currentTimeMillis();
 			obj=users.scan(RECORDS-2);
 			post=System.currentTimeMillis();
 			System.out.println("   - Read late object in "+(post-pre)+"ms");
+			System.out.println(obj.getExecutionPlan().toString());
 			db.close();
 			db=null;
 			

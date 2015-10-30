@@ -8,8 +8,10 @@ public class Column{
 	public int rootId;
 	private int knownFreePageId;
 	private boolean sortable;
+	private String name;
 
-	public Column(PageFile pageFile,int rootId,boolean sortable){
+	public Column(String name,PageFile pageFile,int rootId,boolean sortable){
+		this.name=name;
 		this.pageFile=pageFile;
 		this.rootId=rootId;
 		knownFreePageId=rootId;
@@ -81,7 +83,7 @@ public class Column{
 
 	public ColumnResult scan(ObjectSet set) throws IOException{
 		set.resetMatchCounter();
-		ColumnResult result=new ColumnResult();
+		ColumnResult result=new ColumnResult(name);
 		result.startTimer();
 		Page page=pageFile.getPage(rootId);
 		while(page!=null){
@@ -95,7 +97,7 @@ public class Column{
 			if(!set.isOpen()){
 				if(set.getMatchCount()==set.getCount()){
 					result.endTimer();
-					return list;
+					return result;
 				}
 			}
 			int next=page.getNextPageId();
@@ -111,7 +113,9 @@ public class Column{
 
 	public static void sort(Page page) throws IOException{
 		ObjectSet set=new ObjectSet(true);
-		List<Variant> list=scan(page,set);	
+		ColumnResult result=new ColumnResult("");
+		scan(result,page,set);
+		List<Variant> list=result.getVariantList();	
 		Collections.sort(list);	
 		Variant last=list.remove(list.size()-1);
 		list.add(0,last);

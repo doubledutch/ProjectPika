@@ -15,7 +15,7 @@ public class Table{
 		this.name=name;
 		this.pageFile=pageFile;
 		this.rootPageId=rootPageId;
-		metaData=new Column(pageFile,rootPageId,false);
+		metaData=new Column(name+".metadata",pageFile,rootPageId,false);
 		loadColumns();
 	}
 
@@ -26,12 +26,13 @@ public class Table{
 	private void loadColumns() throws IOException{
 		ObjectSet set=new ObjectSet(true);
 		Map<String,Column> tmp=new HashMap<String,Column>();
-		List<Variant> list=metaData.scan(set);
+		ColumnResult result=metaData.scan(set);
+		List<Variant> list=result.getVariantList();
 		int index=0;
 		while(list.size()>index){
 			Variant.String name=(Variant.String)list.get(index++);
 			Variant.Integer pageId=(Variant.Integer)list.get(index++);
-			Column col=new Column(pageFile,pageId.getValue(),true);
+			Column col=new Column(name.getValue(),pageFile,pageId.getValue(),true);
 			tmp.put(name.getValue(),col);
 		}
 		columnMap=tmp;
@@ -57,7 +58,7 @@ public class Table{
 		metaData.append(new Variant.String(-1,name));
 		metaData.append(new Variant.Integer(-1,page.getId()));
 		pageFile.saveChanges(false);
-		Column col=new Column(pageFile,page.getId(),true);
+		Column col=new Column(name,pageFile,page.getId(),true);
 		columnMap.put(name,col);
 		return col;
 	}
@@ -122,13 +123,18 @@ public class Table{
 
 	public ResultSet scan(ObjectSet set,Collection<String> columns) throws IOException,JSONException{
 		ResultSet result=new ResultSet();
+		result.startTimer();
 		for(String columnName:columns){
 			Column col=columnMap.get(columnName);
-			List<Variant> list=col.scan(set);
+			ColumnResult colResult=col.scan(set);
+			List<Variant> list=colResult.getVariantList();
 			for(Variant v:list){
 				set.addVariant(columnName,v);
 			}
+			result.addExecutionPlan(colResult.getExecutionPlan());
 		}
-		return set.getObjectList();
+		result.setObjectList(set.getObjectList());
+		result.endTimer();
+		return result;
 	}
 }

@@ -1,18 +1,25 @@
 package me.doubledutch.pikadb;
 
 import java.util.*;
+import org.json.*;
 
 public class ColumnResult{
 	private List<Variant> list;
 	private long tStart,tEnd;
 	private int pagesScanned,pagesSkipped,variantsRead;
+	private String name;
 
-	public ColumnResult(){
+	public ColumnResult(String name){
+		this.name=name;
 		this.list=new ArrayList<Variant>();
 	}
 
 	public void add(Variant v){
 		list.add(v);
+	}
+
+	public List<Variant> getVariantList(){
+		return list;
 	}
 
 	public void startTimer(){
@@ -23,7 +30,7 @@ public class ColumnResult{
 		tEnd=System.nanoTime();
 	}
 
-	public void incPageScaned(){
+	public void incPageScanned(){
 		pagesScanned++;
 	}
 
@@ -35,8 +42,10 @@ public class ColumnResult{
 		variantsRead++;
 	}
 
-	public JSONObject getExecutionPlan(){
+	public JSONObject getExecutionPlan() throws JSONException{
 		JSONObject obj=new JSONObject();
+		obj.put("column",name);
+		obj.put("operation","scan");
 		obj.put("time",(tEnd-tStart));
 		obj.put("pages.scanned",pagesScanned);
 		obj.put("pages.skipped",pagesSkipped);
