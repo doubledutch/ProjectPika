@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.*;
 import org.json.*;
 
+import me.doubledutch.pikadb.query.*;
+
 public class Table{
 	private String name;
 	private PageFile pageFile;
@@ -91,6 +93,11 @@ public class Table{
             Variant variant=Variant.createVariant(oid,value);
             col.append(variant);
         }
+	}
+
+	public Query select(String... columns){
+		Query q=new Query(this,columns);
+		return q;
 	}
 
 	public ResultSet scan() throws IOException,JSONException{
