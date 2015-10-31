@@ -24,6 +24,16 @@ public class VariantTest{
 	}
 
 	@Test
+	public void testShort() {
+		short value=128;
+		Variant v=new Variant.Short(42,value);
+		assertTrue(v.getType()==Variant.SHORT);
+		assertTrue((short)(v.getObjectValue())==value);
+		assertTrue(v.getOID()==42);
+		assertTrue(((Variant.Short)v).getValue()==value);
+	}
+
+	@Test
 	public void testVariantIO() throws IOException{
 		/*ByteArrayOutputStream bout=new ByteArrayOutputStream();
 		DataOutputStream dout=new DataOutputStream(bout);
