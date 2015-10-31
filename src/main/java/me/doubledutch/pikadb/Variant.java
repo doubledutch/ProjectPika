@@ -21,7 +21,6 @@ public abstract class Variant implements Comparable<Variant>{
 	public abstract int getType();
 	public abstract int getSize();
 	public abstract Object getObjectValue();
-	public abstract byte[] toByteArray() throws IOException;
 	public abstract void writeVariant(DataOutput out) throws IOException;
 	// public abstract void skipValue(DataInput in) throws IOException;
 
@@ -99,6 +98,15 @@ public abstract class Variant implements Comparable<Variant>{
 			}
 		}
 		return null;
+	}
+
+	public byte[] toByteArray() throws IOException{
+		ByteArrayOutputStream data=new ByteArrayOutputStream();
+		DataOutputStream out=new DataOutputStream(data);
+		writeVariant(out);
+		out.flush();
+		out.close();
+		return data.toByteArray();
 	}
 
 	public static class Skip extends Variant{
@@ -191,15 +199,6 @@ public abstract class Variant implements Comparable<Variant>{
 			return new Variant.Skip(1+4+4);
 		}
 
-		public byte[] toByteArray() throws IOException{
-			ByteArrayOutputStream data=new ByteArrayOutputStream();
-			DataOutputStream out=new DataOutputStream(data);
-			writeVariant(out);
-			out.flush();
-			out.close();
-			return data.toByteArray();
-		}
-
 		public static Variant.Integer readValue(int oid,DataInput in) throws IOException{
 			return new Variant.Integer(oid,in.readInt());
 		}
@@ -274,15 +273,6 @@ public abstract class Variant implements Comparable<Variant>{
 			out.writeBoolean(value);
 		}
 
-		public byte[] toByteArray() throws IOException{
-			ByteArrayOutputStream data=new ByteArrayOutputStream();
-			DataOutputStream out=new DataOutputStream(data);
-			writeVariant(out);
-			out.flush();
-			out.close();
-			return data.toByteArray();
-		}
-
 		public static Variant skipValue(DataInput in) throws IOException{
 			in.skipBytes(1);
 			return new Variant.Skip(1+4+1);
@@ -349,15 +339,6 @@ public abstract class Variant implements Comparable<Variant>{
 			out.writeByte(FLOAT);
 			out.writeInt(oid);
 			out.writeFloat(value);
-		}
-
-		public byte[] toByteArray() throws IOException{
-			ByteArrayOutputStream data=new ByteArrayOutputStream();
-			DataOutputStream out=new DataOutputStream(data);
-			writeVariant(out);
-			out.flush();
-			out.close();
-			return data.toByteArray();
 		}
 
 		public static Variant.Float readValue(int oid,DataInput in) throws IOException{
@@ -439,15 +420,6 @@ public abstract class Variant implements Comparable<Variant>{
 			out.writeDouble(value);
 		}
 
-		public byte[] toByteArray() throws IOException{
-			ByteArrayOutputStream data=new ByteArrayOutputStream();
-			DataOutputStream out=new DataOutputStream(data);
-			writeVariant(out);
-			out.flush();
-			out.close();
-			return data.toByteArray();
-		}
-
 		public static Variant.Double readValue(int oid,DataInput in) throws IOException{
 			return new Variant.Double(oid,in.readDouble());
 		}
@@ -525,15 +497,6 @@ public abstract class Variant implements Comparable<Variant>{
 			out.writeByte(LONG);
 			out.writeInt(oid);
 			out.writeLong(value);
-		}
-
-		public byte[] toByteArray() throws IOException{
-			ByteArrayOutputStream data=new ByteArrayOutputStream();
-			DataOutputStream out=new DataOutputStream(data);
-			writeVariant(out);
-			out.flush();
-			out.close();
-			return data.toByteArray();
 		}
 
 		public static Variant.Long readValue(int oid,DataInput in) throws IOException{
@@ -617,15 +580,6 @@ public abstract class Variant implements Comparable<Variant>{
 			for(int i=0;i<value.length();i++){
 				out.writeChar(value.charAt(i));
 			}
-		}
-
-		public byte[] toByteArray() throws IOException{
-			ByteArrayOutputStream data=new ByteArrayOutputStream();
-			DataOutputStream out=new DataOutputStream(data);
-			writeVariant(out);
-			out.flush();
-			out.close();
-			return data.toByteArray();
 		}
 
 		public static Variant.String readValue(int oid,DataInput in) throws IOException{
