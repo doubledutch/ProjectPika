@@ -759,9 +759,13 @@ public abstract class Variant implements Comparable<Variant>{
 		// less than, equal to, or greater than the specified object.
 		public int compareTo(Variant v){
 			switch(v.getType()){
+				case SHORT:
+					int shval=((Variant.Short)v).getValue();
+					java.lang.String sval=java.lang.String.valueOf(shval);
+					return value.compareTo(sval);
 				case INTEGER:
 					int ival=((Variant.Integer)v).getValue();
-					java.lang.String sval=java.lang.String.valueOf(ival);
+					sval=java.lang.String.valueOf(ival);
 					return value.compareTo(sval);
 				case LONG:
 					long lval=((Variant.Long)v).getValue();
