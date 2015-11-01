@@ -1,6 +1,8 @@
 version = '1.0'
 
 apply plugin: 'java'
+apply plugin: 'cobertura'
+apply plugin: 'com.github.kt3k.coveralls'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -10,6 +12,17 @@ defaultTasks = ['clean', 'jar']
 
 File javaHome = new File(System.getProperty('java.home'))
 // logger.lifecycle "Using Java from $javaHome (version ${System.getProperty('java.version')})"
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.saliman:gradle-cobertura-plugin:2.2.4'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.4.0'
+    }
+}
 
 repositories {
     mavenLocal()
@@ -32,4 +45,13 @@ jar {
         attributes 'Implementation-Title': 'PikaDB', 'Implementation-Version': version, 'Main-Class': 'me.doubledutch.pikadb.Test'
     }
 }
+
+cobertura {
+    coverageFormats = ['html', 'xml']
+    coverageIgnoreTrivial = true
+    coverageIgnores = ['org.slf4j.Logger.*']
+    coverageReportDir = new File("$buildDir/reports/cobertura")
+}
+
+test.finalizedBy(project.tasks.cobertura)
 
