@@ -1,8 +1,6 @@
 package me.doubledutch.pikadb;
 
 import java.io.*;
-import org.json.*;
-import java.util.*;
 
 public abstract class Variant implements Comparable<Variant>{
 	public final static int STOP=0;
@@ -15,6 +13,7 @@ public abstract class Variant implements Comparable<Variant>{
 	public final static int SKIP=7;
 	public final static int LONG=8;
 	public final static int SHORT=9;
+	public final static int BYTE=10;
 
 	// public static Variant skipVariant=new Variant.Skip();
 
@@ -48,6 +47,12 @@ public abstract class Variant implements Comparable<Variant>{
 	}
 
 	public static Variant createVariant(int oid,Object obj){
+		if(obj instanceof java.lang.Byte){
+			return new Variant.Byte(oid,(java.lang.Byte)obj);
+		}
+		if(obj instanceof java.lang.Short){
+			return new Variant.Short(oid,(java.lang.Short)obj);
+		}
 		if(obj instanceof java.lang.Integer){
 			return new Variant.Integer(oid,(java.lang.Integer)obj);
 		}
@@ -82,6 +87,7 @@ public abstract class Variant implements Comparable<Variant>{
 		int oid=in.readInt();
 		if(set.contains(oid)){
 			switch(type){
+				case BYTE:return Variant.Byte.readValue(oid,in);
 				case SHORT:return Variant.Short.readValue(oid,in);
 				case INTEGER:return Variant.Integer.readValue(oid,in);
 				case LONG:return Variant.Long.readValue(oid,in);
@@ -92,6 +98,7 @@ public abstract class Variant implements Comparable<Variant>{
 			}
 		}else{
 			switch(type){
+				case BYTE:return Variant.Byte.skipValue(in);
 				case SHORT:return Variant.Short.skipValue(in);
 				case INTEGER:return Variant.Integer.skipValue(in);
 				case LONG:return Variant.Long.skipValue(in);
@@ -211,6 +218,11 @@ public abstract class Variant implements Comparable<Variant>{
 		// less than, equal to, or greater than the specified object.
 		public int compareTo(Variant v){
 			switch(v.getType()){
+				case BYTE:
+					int bval=((Variant.Byte)v).getValue();
+					if(bval<value)return -1;
+					if(bval==value)return 0;
+					return 1;
 				case SHORT:
 					int shval=((Variant.Short)v).getValue();
 					if(shval<value)return -1;
@@ -302,6 +314,8 @@ public abstract class Variant implements Comparable<Variant>{
 
 		public int compareTo(Variant v){
 			switch(v.getType()){
+				case BYTE:
+					return 0;
 				case SHORT:
 					return 0;
 				case INTEGER:
@@ -378,6 +392,11 @@ public abstract class Variant implements Comparable<Variant>{
 		// less than, equal to, or greater than the specified object.
 		public int compareTo(Variant v){
 			switch(v.getType()){
+				case BYTE:
+					int bval=((Variant.Byte)v).getValue();
+					if(bval<value)return -1;
+					if(bval==value)return 0;
+					return 1;
 				case SHORT:
 					int shval=((Variant.Short)v).getValue();
 					if(shval<value)return -1;
@@ -471,6 +490,11 @@ public abstract class Variant implements Comparable<Variant>{
 		// less than, equal to, or greater than the specified object.
 		public int compareTo(Variant v){
 			switch(v.getType()){
+				case BYTE:
+					int bval=((Variant.Byte)v).getValue();
+					if(bval<value)return -1;
+					if(bval==value)return 0;
+					return 1;
 				case SHORT:
 					int shval=((Variant.Short)v).getValue();
 					if(shval<value)return -1;
@@ -564,6 +588,11 @@ public abstract class Variant implements Comparable<Variant>{
 		// less than, equal to, or greater than the specified object.
 		public int compareTo(Variant v){
 			switch(v.getType()){
+				case BYTE:
+					int bval=((Variant.Byte)v).getValue();
+					if(bval<value)return -1;
+					if(bval==value)return 0;
+					return 1;
 				case SHORT:
 					int shval=((Variant.Short)v).getValue();
 					if(shval<value)return -1;
@@ -657,6 +686,109 @@ public abstract class Variant implements Comparable<Variant>{
 		// less than, equal to, or greater than the specified object.
 		public int compareTo(Variant v){
 			switch(v.getType()){
+				case BYTE:
+					int bval=((Variant.Byte)v).getValue();
+					if(bval<value)return -1;
+					if(bval==value)return 0;
+					return 1;
+				case SHORT:
+					int shval=((Variant.Short)v).getValue();
+					if(shval<value)return -1;
+					if(shval==value)return 0;
+					return 1;
+				case INTEGER:
+					int ival=((Variant.Integer)v).getValue();
+					if(ival<value)return -1;
+					if(ival==value)return 0;
+					return 1;
+				case LONG:
+					long lval=((Variant.Long)v).getValue();
+					if(lval<value)return -1;
+					if(lval==value)return 0;
+					return 1;
+				case FLOAT:
+					float fval=((Variant.Float)v).getValue();
+					if(fval<value)return -1;
+					if(fval==value)return 0;
+					return 1;
+				case DOUBLE:
+					double dval=((Variant.Double)v).getValue();
+					if(dval<value)return -1;
+					if(dval==value)return 0;
+					return 1;
+				case BOOLEAN:
+					return -1;
+				case STRING:
+					java.lang.String sval=((Variant.String)v).getValue();
+					java.lang.String str=java.lang.String.valueOf(value);
+					return str.compareTo(sval);
+			}
+			return 0;
+		}
+	}
+
+	public static class Byte extends Variant{
+		private final int oid;
+		private final byte value;
+
+		public Byte(int oid,byte value){
+			this.oid=oid;
+			this.value=value;
+		}
+
+		public int getOID(){
+			return oid;
+		}
+
+		public int getSize(){
+			return 1+4+1;
+		}
+
+		public int getType(){
+			return BYTE;
+		}
+
+		public Object getObjectValue(){
+			return value;
+		}
+
+		public byte getValue(){
+			return value;
+		}
+
+		public static Variant skipValue(DataInput in) throws IOException{
+			in.skipBytes(1);
+			return new Variant.Skip(1+4+1);
+		}
+
+		public void writeVariant(DataOutput out) throws IOException{
+			out.writeByte(BYTE);
+			out.writeInt(oid);
+			out.writeLong(value);
+		}
+
+		public byte[] toByteArray() throws IOException{
+			ByteArrayOutputStream data=new ByteArrayOutputStream();
+			DataOutputStream out=new DataOutputStream(data);
+			writeVariant(out);
+			out.flush();
+			out.close();
+			return data.toByteArray();
+		}
+
+		public static Variant.Byte readValue(int oid,DataInput in) throws IOException{
+			return new Variant.Byte(oid,in.readByte());
+		}
+
+		// Returns a negative integer, zero, or a positive integer as this object is
+		// less than, equal to, or greater than the specified object.
+		public int compareTo(Variant v){
+			switch(v.getType()){
+				case BYTE:
+					int bval=((Variant.Byte)v).getValue();
+					if(bval<value)return -1;
+					if(bval==value)return 0;
+					return 1;
 				case SHORT:
 					int shval=((Variant.Short)v).getValue();
 					if(shval<value)return -1;
@@ -759,9 +891,13 @@ public abstract class Variant implements Comparable<Variant>{
 		// less than, equal to, or greater than the specified object.
 		public int compareTo(Variant v){
 			switch(v.getType()){
+				case BYTE:
+					int bval=((Variant.Byte)v).getValue();
+					java.lang.String sval=java.lang.String.valueOf(bval);
+					return value.compareTo(sval);
 				case SHORT:
 					int shval=((Variant.Short)v).getValue();
-					java.lang.String sval=java.lang.String.valueOf(shval);
+					sval=java.lang.String.valueOf(shval);
 					return value.compareTo(sval);
 				case INTEGER:
 					int ival=((Variant.Integer)v).getValue();
