@@ -44,28 +44,28 @@ public class Predicate{
 	}
 
 	public Predicate equalTo(Variant v){
-		Predicate p=Predicate(query,EQUALS,v);
+		Predicate p=new Predicate(query,EQUALS,v);
 		leftChild=p;
 		return p;
 		// TODO: check that this can only be created on a where predicate
 	}
 
 	public Predicate lessThan(Variant v){
-		Predicate p=Predicate(query,LESSTHAN,v);
+		Predicate p=new Predicate(query,LESSTHAN,v);
 		leftChild=p;
 		return p;
 		// TODO: check that this can only be created on a where predicate
 	}
 
 	public Predicate greaterThan(Variant v){
-		Predicate p=Predicate(query,GREATERTHAN,v);
+		Predicate p=new Predicate(query,GREATERTHAN,v);
 		leftChild=p;
 		return p;
 		// TODO: check that this can only be created on a where predicate
 	}
 
 	public Predicate like(String str){
-		Predicate p=Predicate(query,LIKE,str);
+		Predicate p=new Predicate(query,LIKE,str);
 		leftChild=p;
 		return p;
 		// TODO: check that this can only be created on a where predicate

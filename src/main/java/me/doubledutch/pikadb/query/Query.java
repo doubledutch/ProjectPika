@@ -53,8 +53,8 @@ public class Query{
 		return set;
 	}
 
-	private ObjectSet executePredicate(Predicate predicate){
+	private ObjectSet executePredicate(String columnName,Predicate predicate){
 		ObjectSet set=new ObjectSet(false);
-		
+		return set;
 	}
 }
