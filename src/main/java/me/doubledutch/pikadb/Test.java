@@ -14,18 +14,32 @@ public class Test{
 		int RECORDS=100000;
 		try{	
 			System.out.println(" + Writing "+RECORDS+" objects");
-
-			
+			String[] firstNames=new String[]{"James","John","Robert","Michael","William","David","Richard","Charles","Joseph","Thomas",
+										"Mary","Patricia","Linda","Barbara","Elizabeth","Jennifer","Maria","Susan","Margaret","Dorothy",
+										"Christopher","Daniel","Paul","Mark","Donald","George","Kenneth","Steven","Brian","Anthony",
+										"Lisa","Nancy","Karen","Betty","Helen","Sandra","Donna","Carol","Ruth","Sharon","Michelle"};
+			String[] lastNames=new String[]{"Smith","Johnson","Williams","Jones","Brown","Davis","Miller","Wilson","Moore",
+										"Taylor","Anderson","Thomas","Jackson","White","Harris","Martin","Thompson","Garcia",
+										"Martinez","Robinson","Clark","Rodriguez","Lewis","Lee","Walker","Hall","Allen","Young",
+										"Hernandez","King","Wright","Lopez","Hill","Scott","Green","Adams","Baker","Gonzales",
+										"Nelson","Carter","Mitchell","Perez","Roberts","Turner","Phillips","Campbell","Parker",
+										"Evans","Edwards","Collins","Stewart","Sanchez","Morriz","Rogers","Reed","Cook","Morgan",
+										"Bell","Murphy","Bailey","Rivera","Cooper","Richardson","Cox","Howard","Ward","Torres",
+										"Peterson","Gray","Ramirez","James","Watson","Brooks","Kelly","Sanders","Price","Bennett",
+										"Wood","Barnes","Ross","Henderson","Coleman","Jenkins","Perry","Powell","Long","Patterson",
+										"Hughes","Flores","Washington","Butler","Simmons","Foster","Bryant","Alexander","Diaz",
+										"Myers","Ford","Rice","West","Jordan","Owens","Fisher","Harrison","Gibson","Cruz"};
 			PikaDB db=new PikaDB(filename);
 			Table users=db.declareTable("users");
 			long pre=System.currentTimeMillis();
 			for(int i=0;i<RECORDS;i++){
 				JSONObject obj=new JSONObject();
+				obj.put("record_id",i);
 				obj.put("id",java.util.UUID.randomUUID().toString());
-				obj.put("username","kasper.jeppesen"+i);
-				obj.put("firstName","Kasper");
-				obj.put("lastName","Jeppesen");
-				obj.put("image","jerk-"+i+".png");
+				obj.put("firstName",firstNames[(int)(Math.random()*firstNames.length)]);
+				obj.put("lastName",lastNames[(int)(Math.random()*lastNames.length)]);
+				obj.put("username",obj.getString("firstName")+"."+obj.getString("lastName")+"."+(i%100));
+				obj.put("image","http://some-great-service/img/profile-"+i+".png");
 				// obj.put("number",3.1415f);
 				users.add(i,obj);
 			}
@@ -178,17 +192,17 @@ public class Test{
 			obj=users.scan(1);
 			post=System.currentTimeMillis();
 			System.out.println("   - Read early object in "+(post-pre)+"ms");
-			System.out.println(obj.getExecutionPlan().toString());
+			// System.out.println(obj.getExecutionPlan().toString());
 			pre=System.currentTimeMillis();
 			obj=users.scan(RECORDS/2);
 			post=System.currentTimeMillis();
 			System.out.println("   - Read mid object in "+(post-pre)+"ms");
-			System.out.println(obj.getExecutionPlan().toString());
+			// System.out.println(obj.getExecutionPlan().toString());
 			pre=System.currentTimeMillis();
 			obj=users.scan(RECORDS-2);
 			post=System.currentTimeMillis();
 			System.out.println("   - Read late object in "+(post-pre)+"ms");
-			System.out.println(obj.getExecutionPlan().toString());
+			// System.out.println(obj.getExecutionPlan().toString());
 			db.close();
 			db=null;
 			
