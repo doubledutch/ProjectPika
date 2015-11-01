@@ -2,6 +2,10 @@ package me.doubledutch.pikadb.query;
 
 import me.doubledutch.pikadb.Variant;
 
+import java.io.*;
+import org.json.*;
+import me.doubledutch.pikadb.ResultSet;
+
 public class Predicate{
 	protected static final int EQUALS=0;
 	protected static final int LESSTHAN=1;
@@ -39,17 +43,33 @@ public class Predicate{
 		this.pattern=value;
 	}
 
+	public ResultSet execute() throws IOException,JSONException{
+		return query.execute();
+	}
+
 	protected int getType(){
 		return type;
 	}
 
-	public Predicate equalTo(Variant v){
-		Predicate p=new Predicate(query,EQUALS,v);
+	protected String getColumn(){
+		return column;
+	}
+
+	protected Predicate getLeftChild(){
+		return leftChild;
+	}
+
+	protected Predicate getRightChild(){
+		return rightChild;
+	}
+
+	public Predicate equalTo(int v){
+		Predicate p=new Predicate(query,EQUALS,new Variant.Integer(-1,v));
 		leftChild=p;
 		return p;
 		// TODO: check that this can only be created on a where predicate
 	}
-
+	/*
 	public Predicate lessThan(Variant v){
 		Predicate p=new Predicate(query,LESSTHAN,v);
 		leftChild=p;
@@ -70,7 +90,7 @@ public class Predicate{
 		return p;
 		// TODO: check that this can only be created on a where predicate
 	}
-
+*/
 /*
 	public static Predicate isNull(){
 		return new Predicate(ISNULL,null,null,null);
@@ -87,12 +107,12 @@ public class Predicate{
 	public Predicate not(){
 		return new Predicate(NOT,null,this,null);
 	}
-
+*/
 	public boolean testVariant(Variant v){
 		switch(type){
 			case EQUALS:return v.equals(value);
 			case OR:return leftChild.testVariant(v) || rightChild.testVariant(v);
 		}
 		return false;
-	}*/
+	}
 }

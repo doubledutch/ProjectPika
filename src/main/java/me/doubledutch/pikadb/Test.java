@@ -206,6 +206,17 @@ public class Test{
 			db.close();
 			db=null;
 			
+
+			System.out.println(" + Predicate based queries");
+			db=new PikaDB(filename);
+			users=db.declareTable("users");
+			pre=System.currentTimeMillis();
+
+			obj=users.select("id","username").where("record_id").equalTo(1000).execute();
+
+			post=System.currentTimeMillis();
+			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/1000)/((post-pre)/1000.0))+" obj/s");
+
 			/*
 
 

@@ -32,12 +32,16 @@ public class Query{
 		// First build object set using predicates
 		ObjectSet set=executePredicate(predicate);
 		// Now fill in missing values from columns using object set
-
+		if(columns==null || (columns.length==1 && columns[0].equals("*"))){
+			// Scan all columns minus the one in the where clause
+		}else{
+			// Scan only a selected set of columns
+		}
 		result.endTimer();
 		return result;
 	}
 
-	private ObjectSet executePredicate(Predicate predicate){
+	private ObjectSet executePredicate(Predicate predicate) throws IOException,JSONException{
 		ObjectSet set=new ObjectSet(false);
 		if(predicate.getType()==Predicate.OR){
 
@@ -46,15 +50,22 @@ public class Query{
 		}else if(predicate.getType()==Predicate.NOT){
 
 		}else if(predicate.getType()==Predicate.WHERE){
-
+			return executePredicate(predicate.getColumn(),predicate.getLeftChild());
 		}else{
 
 		}
 		return set;
 	}
 
-	private ObjectSet executePredicate(String columnName,Predicate predicate){
-		ObjectSet set=new ObjectSet(false);
-		return set;
+	private ObjectSet executePredicate(String columnName,Predicate predicate) throws IOException,JSONException{
+		ObjectSet closedSet=new ObjectSet(false);
+		ObjectSet openSet=new ObjectSet(true);
+		ResultSet rs=table.scan(openSet,new String[]{columnName});
+		for(Variant v:openSet.getVariants(columnName)){
+			if(predicate.testVariant(v)){
+				closedSet.addVariant(columnName,v);
+			}
+		}
+		return closedSet;
 	}
 }
