@@ -34,6 +34,16 @@ public class VariantTest{
 	}
 
 	@Test
+	public void testByte() {
+		byte value=1;
+		Variant v=new Variant.Byte(42,value);
+		assertTrue(v.getType()==Variant.BYTE);
+		assertTrue((byte)(v.getObjectValue())==value);
+		assertTrue(v.getOID()==42);
+		assertTrue(((Variant.Byte)v).getValue()==value);
+	}
+
+	@Test
 	public void testVariantIO() throws IOException{
 		/*ByteArrayOutputStream bout=new ByteArrayOutputStream();
 		DataOutputStream dout=new DataOutputStream(bout);
