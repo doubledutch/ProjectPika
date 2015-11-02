@@ -48,6 +48,10 @@ public class Table{
 		
 	}
 
+	public String[] getColumns(){
+		return columnMap.keySet().toArray(new String[0]);
+	}
+
 	private Column getColumn(String name) throws IOException{
 		if(!columnMap.containsKey(name)){
 			return createColumn(name);
