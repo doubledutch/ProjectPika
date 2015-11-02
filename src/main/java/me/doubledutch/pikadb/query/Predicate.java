@@ -91,6 +91,20 @@ public class Predicate{
 		return p;
 		// TODO: check that this can only be created on a where predicate
 	}
+
+	public Predicate lessThan(int v){
+		Predicate p=new Predicate(query,LESSTHAN,new Variant.Integer(-1,v));
+		leftChild=p;
+		return p;
+		// TODO: check that this can only be created on a where predicate
+	}
+
+	public Predicate greaterThan(int v){
+		Predicate p=new Predicate(query,GREATERTHAN,new Variant.Integer(-1,v));
+		leftChild=p;
+		return p;
+		// TODO: check that this can only be created on a where predicate
+	}
 	/*
 	public Predicate lessThan(Variant v){
 		Predicate p=new Predicate(query,LESSTHAN,v);
@@ -134,6 +148,8 @@ public class Predicate{
 		// System.out.println("testVariant "+v.getType()+" vs "+value.getType());
 		switch(type){
 			case EQUALS:return v.compareTo(value)==0;
+			case LESSTHAN:return v.compareTo(value)==1;
+			case GREATERTHAN:return v.compareTo(value)==-1;
 			case OR:return leftChild.testVariant(v) || rightChild.testVariant(v);
 		}
 		return false;
