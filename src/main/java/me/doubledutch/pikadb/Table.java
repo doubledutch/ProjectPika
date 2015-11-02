@@ -148,7 +148,9 @@ public class Table{
 			}
 			result.addExecutionPlan(colResult.getExecutionPlan());
 		}
-		result.setObjectList(set.getObjectList());
+
+		// result.setObjectList(set.getObjectList());
+		result.setObjectSet(set);
 		result.endTimer();
 		return result;
 	}

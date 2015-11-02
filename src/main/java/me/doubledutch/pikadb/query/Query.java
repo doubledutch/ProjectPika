@@ -63,7 +63,8 @@ public class Query{
 		String[] backfill=getBackFillColumns(predicate.getColumnList());
 		ResultSet rs=table.scan(set,backfill);
 		result.addExecutionPlan(rs.getExecutionPlan());
-		result.setObjectList(rs.getObjectList());
+		// result.setObjectList(rs.getObjectList());
+		result.setObjectSet(rs.getObjectSet());
 		result.endTimer();
 		return result;
 	}
