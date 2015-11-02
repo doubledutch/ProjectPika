@@ -143,9 +143,11 @@ public class Table{
 			Column col=columnMap.get(columnName);
 			ColumnResult colResult=col.scan(set);
 			List<Variant> list=colResult.getVariantList();
-			for(Variant v:list){
-				set.addVariant(columnName,v);
-			}
+
+			set.addVariantList(columnName,list);
+			// for(Variant v:list){
+			//	set.addVariant(columnName,v);
+			// }
 			result.addExecutionPlan(colResult.getExecutionPlan());
 		}
 
