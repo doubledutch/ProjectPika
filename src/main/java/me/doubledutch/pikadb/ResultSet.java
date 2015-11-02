@@ -5,14 +5,16 @@ import org.json.*;
 
 public class ResultSet{
 	private long tStart,tEnd;
+	private String operation;
 	private JSONArray executionPlan=new JSONArray();
 
-	private List<JSONObject> data=null;
+	private ObjectSet objectSet=null;
+	// private List<JSONObject> data=null;
 	private int pointer=-1;
 	private JSONObject currentObject=null;
 
-	public ResultSet(){
-
+	public ResultSet(String operation){
+		this.operation=operation;
 	}
 
 	public void startTimer(){
@@ -23,12 +25,29 @@ public class ResultSet{
 		tEnd=System.nanoTime();
 	}
 
-	public void setObjectList(List<JSONObject> data){
-		this.data=data;
+	// public void setObjectList(List<JSONObject> data){
+	//	this.data=data;
+	// }
+
+	public List<JSONObject> getObjectList() throws JSONException{
+		// return data;
+		long pre=System.nanoTime();
+		List<JSONObject> data= objectSet.getObjectList();
+		long post=System.nanoTime();
+		JSONObject obj=new JSONObject();
+		obj.put("operation","serialization.json");
+		obj.put("time",(post-pre));
+		obj.put("objects",data.size());
+		executionPlan.put(obj);
+		return data;
 	}
 
-	public List<JSONObject> getObjectList(){
-		return data;
+	public ObjectSet getObjectSet(){
+		return objectSet;
+	}
+
+	public void setObjectSet(ObjectSet set){
+		this.objectSet=set;
 	}
 
 	public void addExecutionPlan(JSONObject obj){
@@ -37,6 +56,7 @@ public class ResultSet{
 
 	public JSONObject getExecutionPlan() throws JSONException{
 		JSONObject obj=new JSONObject();
+		obj.put("operation",operation);
 		obj.put("time",(tEnd-tStart));
 		obj.put("steps",executionPlan);
 		return obj;

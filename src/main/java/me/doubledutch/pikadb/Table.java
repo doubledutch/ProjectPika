@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.*;
 import org.json.*;
 
+import me.doubledutch.pikadb.query.*;
+
 public class Table{
 	private String name;
 	private PageFile pageFile;
@@ -44,6 +46,10 @@ public class Table{
 
 	public void declareColumn(String name,int... constraints) throws IOException{
 		
+	}
+
+	public String[] getColumns(){
+		return columnMap.keySet().toArray(new String[0]);
 	}
 
 	private Column getColumn(String name) throws IOException{
@@ -93,20 +99,25 @@ public class Table{
         }
 	}
 
-	public ResultSet scan() throws IOException,JSONException{
-		return scan(columnMap.keySet());
+	public Query select(String... columns){
+		Query q=new Query(this,columns);
+		return q;
 	}
 
-	public ResultSet scan(Collection<String> columns) throws IOException,JSONException{
+	public ResultSet scan() throws IOException,JSONException{
+		return scan(columnMap.keySet().toArray(new String[0]));
+	}
+
+	public ResultSet scan(String[] columns) throws IOException,JSONException{
 		ObjectSet set=new ObjectSet(true);
 		return scan(set,columns);
 	}
 
 	public ResultSet scan(int oid)  throws IOException,JSONException{
-		return scan(oid,columnMap.keySet());
+		return scan(oid,columnMap.keySet().toArray(new String[0]));
 	}
 
-	public ResultSet scan(int oid,Collection<String> columns)  throws IOException,JSONException{
+	public ResultSet scan(int oid,String[] columns)  throws IOException,JSONException{
 		ObjectSet set=new ObjectSet(false);
         set.addOID(oid);
         return scan(set,columns);
@@ -118,11 +129,15 @@ public class Table{
 	}
 
 	public ResultSet scan(ObjectSet set) throws IOException,JSONException{
-		return scan(set,columnMap.keySet());
+		return scan(set,columnMap.keySet().toArray(new String[0]));
 	}
 
-	public ResultSet scan(ObjectSet set,Collection<String> columns) throws IOException,JSONException{
-		ResultSet result=new ResultSet();
+	public ResultSet scan(ObjectSet set,String[] columns) throws IOException,JSONException{
+		String operation="table.scan";
+		if(!set.isOpen()){
+			operation="table.seek";
+		}
+		ResultSet result=new ResultSet(operation);
 		result.startTimer();
 		for(String columnName:columns){
 			Column col=columnMap.get(columnName);
@@ -133,7 +148,9 @@ public class Table{
 			}
 			result.addExecutionPlan(colResult.getExecutionPlan());
 		}
-		result.setObjectList(set.getObjectList());
+
+		// result.setObjectList(set.getObjectList());
+		result.setObjectSet(set);
 		result.endTimer();
 		return result;
 	}

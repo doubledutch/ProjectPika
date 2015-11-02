@@ -100,9 +100,18 @@ public class ObjectSet{
 		obj.put(columnName,v.getObjectValue());*/
 	}
 
+	public Collection<Variant> getVariants(String columnName){
+		if(columnValueMap.containsKey(columnName)){
+			return columnValueMap.get(columnName).values();
+		}
+		return new LinkedList<Variant>();
+	}
+
 	public List<JSONObject> getObjectList()throws JSONException{
+		// System.out.println("Crafting objects");
 		List<JSONObject> objectList=new ArrayList<JSONObject>();
 		for(Integer oid:oidSet){
+			// System.out.println("Making one");
 			objectList.add(getObject(oid));
 		}
 		return objectList;
