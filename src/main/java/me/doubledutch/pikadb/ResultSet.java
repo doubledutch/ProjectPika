@@ -9,7 +9,7 @@ public class ResultSet{
 	private JSONArray executionPlan=new JSONArray();
 
 	private ObjectSet objectSet=null;
-	// private List<JSONObject> data=null;
+	private List<JSONObject> data=null;
 	private int pointer=-1;
 	private JSONObject currentObject=null;
 
@@ -30,9 +30,9 @@ public class ResultSet{
 	// }
 
 	public List<JSONObject> getObjectList() throws JSONException{
-		// return data;
+		if(data!=null)return data;
 		long pre=System.nanoTime();
-		List<JSONObject> data= objectSet.getObjectList();
+		data= objectSet.getObjectList();
 		long post=System.nanoTime();
 		JSONObject obj=new JSONObject();
 		obj.put("operation","serialization.json");
