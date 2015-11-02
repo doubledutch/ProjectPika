@@ -8,9 +8,11 @@ public class ColumnResult{
 	private long tStart,tEnd;
 	private int pagesScanned,pagesSkipped,variantsRead;
 	private String name;
+	private String type;
 
-	public ColumnResult(String name){
+	public ColumnResult(String name,String type){
 		this.name=name;
+		this.type=type;
 		this.list=new ArrayList<Variant>();
 	}
 
@@ -45,7 +47,7 @@ public class ColumnResult{
 	public JSONObject getExecutionPlan() throws JSONException{
 		JSONObject obj=new JSONObject();
 		obj.put("column",name);
-		obj.put("operation","scan");
+		obj.put("operation",type);
 		obj.put("time",(tEnd-tStart));
 		obj.put("pages.scanned",pagesScanned);
 		obj.put("pages.skipped",pagesSkipped);

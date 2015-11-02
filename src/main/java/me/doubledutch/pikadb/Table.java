@@ -133,7 +133,11 @@ public class Table{
 	}
 
 	public ResultSet scan(ObjectSet set,String[] columns) throws IOException,JSONException{
-		ResultSet result=new ResultSet();
+		String operation="table.scan";
+		if(!set.isOpen()){
+			operation="table.seek";
+		}
+		ResultSet result=new ResultSet(operation);
 		result.startTimer();
 		for(String columnName:columns){
 			Column col=columnMap.get(columnName);

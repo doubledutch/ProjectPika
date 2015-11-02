@@ -108,8 +108,10 @@ public class ObjectSet{
 	}
 
 	public List<JSONObject> getObjectList()throws JSONException{
+		// System.out.println("Crafting objects");
 		List<JSONObject> objectList=new ArrayList<JSONObject>();
 		for(Integer oid:oidSet){
+			// System.out.println("Making one");
 			objectList.add(getObject(oid));
 		}
 		return objectList;

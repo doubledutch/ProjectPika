@@ -38,7 +38,7 @@ public class Test{
 				obj.put("id",java.util.UUID.randomUUID().toString());
 				obj.put("firstName",firstNames[(int)(Math.random()*firstNames.length)]);
 				obj.put("lastName",lastNames[(int)(Math.random()*lastNames.length)]);
-				obj.put("username",obj.getString("firstName")+"."+obj.getString("lastName")+"."+(i%100));
+				obj.put("username",obj.getString("firstName")+"."+obj.getString("lastName")+"."+i);
 				obj.put("image","http://some-great-service/img/profile-"+i+".png");
 				// obj.put("number",3.1415f);
 				users.add(i,obj);
@@ -212,11 +212,13 @@ public class Test{
 			users=db.declareTable("users");
 			pre=System.currentTimeMillis();
 
-			obj=users.select("id","username").where("record_id").equalTo(1000).execute();
-
+			obj=users.select("id","record_id","username").where("record_id").equalTo(1000).execute();
+			for(JSONObject jobj:obj.getObjectList()){
+				System.out.println(jobj.toString());
+			}
 			post=System.currentTimeMillis();
-			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/1000)/((post-pre)/1000.0))+" obj/s");
-
+			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((obj.getObjectList().size())/((post-pre)/1000.0))+" obj/s");
+			System.out.println(obj.getExecutionPlan().toString(4));
 			/*
 
 

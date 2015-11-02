@@ -55,6 +55,28 @@ public class Predicate{
 		return column;
 	}
 
+	protected String[] getColumnList(){
+		String[] a=leftChild==null?new String[0]:leftChild.getColumnList();
+		String[] b=rightChild==null?new String[0]:rightChild.getColumnList();
+		int num=a.length+b.length;
+		if(type==WHERE){
+			num+=1;
+		}
+		if(num==0)return new String[0];
+		String[] result=new String[num];
+		int index=0;
+		if(type==WHERE){
+			result[index++]=column;
+		}
+		for(String key:a){
+			result[index++]=key;
+		}
+		for(String key:b){
+			result[index++]=key;
+		}
+		return result;
+	}
+
 	protected Predicate getLeftChild(){
 		return leftChild;
 	}
@@ -109,8 +131,9 @@ public class Predicate{
 	}
 */
 	public boolean testVariant(Variant v){
+		// System.out.println("testVariant "+v.getType()+" vs "+value.getType());
 		switch(type){
-			case EQUALS:return v.equals(value);
+			case EQUALS:return v.compareTo(value)==0;
 			case OR:return leftChild.testVariant(v) || rightChild.testVariant(v);
 		}
 		return false;

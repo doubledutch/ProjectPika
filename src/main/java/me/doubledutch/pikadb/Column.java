@@ -83,7 +83,11 @@ public class Column{
 
 	public ColumnResult scan(ObjectSet set) throws IOException{
 		set.resetMatchCounter();
-		ColumnResult result=new ColumnResult(name);
+		String operation="column.scan";
+		if(!set.isOpen()){
+			operation="column.seek";
+		}
+		ColumnResult result=new ColumnResult(name,operation);
 		result.startTimer();
 		Page page=pageFile.getPage(rootId);
 		while(page!=null){
@@ -113,7 +117,7 @@ public class Column{
 
 	public static void sort(Page page) throws IOException{
 		ObjectSet set=new ObjectSet(true);
-		ColumnResult result=new ColumnResult("");
+		ColumnResult result=new ColumnResult("","");
 		scan(result,page,set);
 		List<Variant> list=result.getVariantList();	
 		Collections.sort(list);	
