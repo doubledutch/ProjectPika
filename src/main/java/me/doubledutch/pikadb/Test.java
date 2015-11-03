@@ -73,7 +73,8 @@ public class Test{
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
 			pre=System.currentTimeMillis();
-			list=users.select().execute();
+			list=users.scan();
+			list.getObjectList();
 			/*for(int i=0;i<RECORDS;i++){
 				JSONObject obj=list.get(i);
 				// System.out.println(obj.toString());
@@ -102,6 +103,7 @@ public class Test{
 				}
 			}
 			list=users.scan(set);
+			list.getObjectList();
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
@@ -121,6 +123,7 @@ public class Test{
 				}
 			}
 			list=users.scan(set);
+			list.getObjectList();
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
@@ -139,6 +142,7 @@ public class Test{
 				}
 			}
 			list=users.scan(set);
+			list.getObjectList();
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
@@ -157,6 +161,7 @@ public class Test{
 				}
 			}
 			list=users.scan(set);
+			list.getObjectList();
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
@@ -176,6 +181,7 @@ public class Test{
 				}
 			}
 			list=users.scan(set);
+			list.getObjectList();
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
@@ -190,16 +196,19 @@ public class Test{
 
 			pre=System.currentTimeMillis();
 			obj=users.scan(1);
+			obj.getObjectList();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read early object in "+(post-pre)+"ms");
 			// System.out.println(obj.getExecutionPlan().toString());
 			pre=System.currentTimeMillis();
 			obj=users.scan(RECORDS/2);
+			obj.getObjectList();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read mid object in "+(post-pre)+"ms");
 			// System.out.println(obj.getExecutionPlan().toString());
 			pre=System.currentTimeMillis();
 			obj=users.scan(RECORDS-2);
+			obj.getObjectList();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read late object in "+(post-pre)+"ms");
 			// System.out.println(obj.getExecutionPlan().toString());
