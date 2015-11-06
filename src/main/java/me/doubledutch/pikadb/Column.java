@@ -2,6 +2,7 @@ package me.doubledutch.pikadb;
 
 import java.util.*;
 import java.io.*;
+import me.doubledutch.pikadb.query.*;
 
 public class Column{
 	private PageFile pageFile;
@@ -63,17 +64,23 @@ public class Column{
 		return page;
 	}
 
-	protected static void scan(ColumnResult result,Page page,ObjectSet set) throws IOException{
+	protected static void scan(ColumnResult result,Page page,ObjectSet set,Predicate predicate) throws IOException{
 		result.incPageScanned();
 		DataInput in=page.getDataInput();
 		Variant v=Variant.readVariant(in,set);
 		while(v!=null){
 			result.incVariantRead();
 			if(v.getType()!=Variant.SKIP){
-				result.add(v);
-				if(!set.isOpen()){
-					if(set.getMatchCount()==set.getCount()){
-						return;
+				boolean shouldAdd=true;
+				if(predicate!=null){
+					shouldAdd=predicate.testVariant(v);
+				}
+				if(shouldAdd){
+					result.add(v);
+					if(!set.isOpen()){
+						if(set.getMatchCount()==set.getCount()){
+							return;
+						}
 					}
 				}
 			}
@@ -83,19 +90,27 @@ public class Column{
 	}
 
 	public ColumnResult scan(ObjectSet set) throws IOException{
+		return scan(set,null);
+	}
+
+
+	public ColumnResult scan(ObjectSet set,Predicate predicate) throws IOException{
 		set.resetMatchCounter();
 		String operation="column.scan";
 		if(!set.isOpen()){
 			operation="column.seek";
+		}
+		if(predicate!=null){
+			operation="column.query";
 		}
 		ColumnResult result=new ColumnResult(name,operation);
 		result.startTimer();
 		Page page=pageFile.getPage(rootId);
 		while(page!=null){
 			if((!set.isOpen()) && set.anyObjectsInBloomFilter(page.getBloomFilter())){
-				scan(result,page,set);
+				scan(result,page,set,predicate);
 			}else if(set.isOpen()){
-				scan(result,page,set);
+				scan(result,page,set,predicate);
 			}else{
 				result.incPageSkipped();
 			}
@@ -119,7 +134,7 @@ public class Column{
 	public static void sort(Page page) throws IOException{
 		ObjectSet set=new ObjectSet(true);
 		ColumnResult result=new ColumnResult("","");
-		scan(result,page,set);
+		scan(result,page,set,null);
 		List<Variant> list=result.getVariantList();	
 		Collections.sort(list);	
 		Variant last=list.remove(list.size()-1);

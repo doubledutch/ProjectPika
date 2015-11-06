@@ -112,7 +112,7 @@ public class Table{
 
 	public ResultSet scan(String[] columns) throws IOException,JSONException{
 		ObjectSet set=new ObjectSet(true);
-		return scan(set,columns);
+		return scan(set,columns,null);
 	}
 
 	public ResultSet scan(int oid)  throws IOException,JSONException{
@@ -122,7 +122,7 @@ public class Table{
 	public ResultSet scan(int oid,String[] columns)  throws IOException,JSONException{
 		ObjectSet set=new ObjectSet(false);
         set.addOID(oid);
-        return scan(set,columns);
+        return scan(set,columns,null);
         /*JSONObject obj=set.getObject(oid);
         Iterator<String> it=obj.keys();
         if(!it.hasNext()){
@@ -131,10 +131,10 @@ public class Table{
 	}
 
 	public ResultSet scan(ObjectSet set) throws IOException,JSONException{
-		return scan(set,columnMap.keySet().toArray(new String[0]));
+		return scan(set,columnMap.keySet().toArray(new String[0]),null);
 	}
 
-	public ResultSet scan(ObjectSet set,String[] columns) throws IOException,JSONException{
+	public ResultSet scan(ObjectSet set,String[] columns,Predicate predicate) throws IOException,JSONException{
 		String operation="table.scan";
 		if(!set.isOpen()){
 			operation="table.seek";
@@ -143,7 +143,7 @@ public class Table{
 		result.startTimer();
 		for(String columnName:columns){
 			Column col=columnMap.get(columnName);
-			ColumnResult colResult=col.scan(set);
+			ColumnResult colResult=col.scan(set,predicate);
 			List<Variant> list=colResult.getVariantList();
 
 			set.addVariantList(columnName,list);

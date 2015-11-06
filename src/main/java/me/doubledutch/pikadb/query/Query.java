@@ -61,7 +61,7 @@ public class Query{
 		// System.out.println("objectSet count "+set.getCount());
 		// Now fill in missing values from columns using object set
 		String[] backfill=getBackFillColumns(predicate.getColumnList());
-		ResultSet rs=table.scan(set,backfill);
+		ResultSet rs=table.scan(set,backfill,null);
 		result.addExecutionPlan(rs.getExecutionPlan());
 		// result.setObjectList(rs.getObjectList());
 		result.setObjectSet(rs.getObjectSet());
@@ -90,23 +90,23 @@ public class Query{
 		// System.out.println("Executing predicate on "+columnName);
 		ObjectSet closedSet=new ObjectSet(false);
 		ObjectSet openSet=new ObjectSet(true);
-		ResultSet rs=table.scan(openSet,new String[]{columnName});
+		ResultSet rs=table.scan(openSet,new String[]{columnName},predicate);
 		long tStart=System.nanoTime();
 		for(Variant v:openSet.getVariants(columnName)){
-			if(predicate.testVariant(v)){
+			// if(predicate.testVariant(v)){
 				// System.out.println("Found one in "+columnName+" for "+v.getOID());
 				closedSet.addOID(v.getOID());
 				closedSet.addVariant(columnName,v);
-			}
+			// }
 		}
 		long tEnd=System.nanoTime();
 		result.addExecutionPlan(rs.getExecutionPlan());
-		JSONObject obj=new JSONObject();
+		/*JSONObject obj=new JSONObject();
 		obj.put("column",columnName);
 		obj.put("operation","compare");
 		obj.put("time",(tEnd-tStart));
 		obj.put("variants.compared",openSet.getCount());
-		result.addExecutionPlan(obj);
+		result.addExecutionPlan(obj);*/
 		return closedSet;
 	}
 }
