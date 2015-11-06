@@ -49,16 +49,17 @@ public class Column{
 			int nextPageId=page.getNextPageId();
 			if(nextPageId==-1){
 				Page next=pageFile.createPage();
-				if(!sortable){
-					next.makeUnsortable();
-				}
 				page.setNextPageId(next.getId());
 				page=next;
 			}else{
 				page=pageFile.getPage(nextPageId);
+
 			}
 		}
 		knownFreePageId=page.getId();
+		if(!sortable){
+			page.makeUnsortable();
+		}
 		return page;
 	}
 

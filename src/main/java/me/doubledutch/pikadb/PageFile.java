@@ -60,17 +60,19 @@ public class PageFile{
 		return getPage(id);
 	}
 
-	public void saveChanges(boolean sort) throws IOException{
+	public void saveChanges() throws IOException{
 		// Write to write ahead log
 		if(wal==null){
 			wal=new WriteAheadLog(filename);
 		}
 		wal.beginTransaction();
 		for(Page page:pageMap.values()){
-			if(page.isDirty() && page.getFillRatio()>0.5  && sort){ // TODO: figure out the right threshold
+			if(page.isDirty() && page.getFillRatio()>0.75  && page.isSortable()){ // TODO: figure out the right threshold
 				page.flatten();
-				// Column.sort(page);
-			}
+				Column.sort(page);
+			}else if(page.isDirty() && page.isSortable()){
+				page.setSorted(false);
+			} 
 		 	page.commitChanges(wal);
 		}
 		wal.closeTransaction();

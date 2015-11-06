@@ -12,11 +12,13 @@ public class Table{
 	private int rootPageId;
 	private Column metaData;
 	private Map<String,Column> columnMap;
+	private boolean preserve_order;
 
 	public Table(String name,PageFile pageFile,int rootPageId,boolean preserve_order) throws IOException{
 		this.name=name;
 		this.pageFile=pageFile;
 		this.rootPageId=rootPageId;
+		this.preserve_order=preserve_order;
 		metaData=new Column(name+".metadata",pageFile,rootPageId,false);
 		loadColumns();
 	}
@@ -34,7 +36,7 @@ public class Table{
 		while(list.size()>index){
 			Variant.String name=(Variant.String)list.get(index++);
 			Variant.Integer pageId=(Variant.Integer)list.get(index++);
-			Column col=new Column(name.getValue(),pageFile,pageId.getValue(),true);
+			Column col=new Column(name.getValue(),pageFile,pageId.getValue(),!preserve_order);
 			tmp.put(name.getValue(),col);
 		}
 		columnMap=tmp;
@@ -63,8 +65,8 @@ public class Table{
 		Page page=pageFile.createPage();
 		metaData.append(new Variant.String(-1,name));
 		metaData.append(new Variant.Integer(-1,page.getId()));
-		pageFile.saveChanges(false);
-		Column col=new Column(name,pageFile,page.getId(),true);
+		pageFile.saveChanges();
+		Column col=new Column(name,pageFile,page.getId(),!preserve_order);
 		columnMap.put(name,col);
 		return col;
 	}
