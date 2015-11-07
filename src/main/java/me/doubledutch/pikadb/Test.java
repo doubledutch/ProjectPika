@@ -257,8 +257,7 @@ public class Test{
 			obj.getObjectList();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read 1000 early objects in "+(post-pre)+"ms "+(int)((1000)/((post-pre)/1000.0))+" obj/s");
-	
-			
+
 			/*
 
 

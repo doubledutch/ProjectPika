@@ -62,6 +62,7 @@ public class ObjectSet{
 		// objectList.add(obj);
 	}
 
+
 	public JSONObject getObject(Integer oid)throws JSONException{
 		if(!oidSet.contains(oid)){
 			return null;

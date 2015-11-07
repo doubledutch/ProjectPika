@@ -47,6 +47,10 @@ public class Predicate{
 		return query.execute();
 	}
 
+	public Variant getValue(){
+		return value;
+	}
+
 	public int getType(){
 		return type;
 	}

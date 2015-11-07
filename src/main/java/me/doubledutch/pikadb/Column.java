@@ -93,6 +93,28 @@ public class Column{
 					addToSet(vMax,result,set,predicate);
 					return;
 				}
+				// Variant.createVariant(0,5).compareTo(Variant.createVariant(1,10))
+				// 1
+				Variant value=predicate.getValue();
+				int c1=value.compareTo(vMin);
+				int c2=value.compareTo(vMax);
+
+				if(type==Predicate.EQUALS){
+					if(c1==1){ // vMin > value
+						return;
+					}
+					if(c2==-1){ // vMax < value
+						return;
+					}
+				}else if(type==Predicate.LESSTHAN){
+					if(c1==1){ // vMin > value
+						return;
+					}	
+				}else if(type==Predicate.GREATERTHAN){
+					if(c2==-1){ // vMax < value
+						return;
+					}
+				}
 				addToSet(vMax,result,set,predicate);
 				addToSet(vMin,result,set,predicate);
 				// System.out.println("so sorted");
