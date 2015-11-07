@@ -234,13 +234,17 @@ public class Test{
 
 			pre=System.currentTimeMillis();
 			obj=users.select("id","record_id","username").where("record_id").equalTo(RECORDS-2).execute();
+			
 			obj.getObjectList();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read late object in "+(post-pre)+"ms");
-			// System.out.println(obj.getExecutionPlan().toString(4));
+			System.out.println(obj.getExecutionPlan().toString(4));
 
 			pre=System.currentTimeMillis();
+			
 			obj=users.select("id","record_id","username").where("record_id").lessThan(1000).execute();
+			
+
 			obj.getObjectList();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read 1000 late objects in "+(post-pre)+"ms "+(int)((1000)/((post-pre)/1000.0))+" obj/s");

@@ -7,15 +7,15 @@ import org.json.*;
 import me.doubledutch.pikadb.ResultSet;
 
 public class Predicate{
-	protected static final int EQUALS=0;
-	protected static final int LESSTHAN=1;
-	protected static final int GREATERTHAN=2;
-	protected static final int LIKE=3;
-	protected static final int ISNULL=4;
-	protected static final int OR=5;
-	protected static final int AND=6;
-	protected static final int NOT=7;
-	protected static final int WHERE=8;
+	public static final int EQUALS=0;
+	public static final int LESSTHAN=1;
+	public static final int GREATERTHAN=2;
+	public static final int LIKE=3;
+	public static final int ISNULL=4;
+	public static final int OR=5;
+	public static final int AND=6;
+	public static final int NOT=7;
+	public static final int WHERE=8;
 
 	private Query query;
 	private String column;
@@ -47,7 +47,7 @@ public class Predicate{
 		return query.execute();
 	}
 
-	protected int getType(){
+	public int getType(){
 		return type;
 	}
 

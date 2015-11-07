@@ -134,6 +134,8 @@ public class Table{
 		return scan(set,columnMap.keySet().toArray(new String[0]),null);
 	}
 
+	// TODO: change to columnscan with predicate!!!
+
 	public ResultSet scan(ObjectSet set,String[] columns,Predicate predicate) throws IOException,JSONException{
 		String operation="table.scan";
 		if(!set.isOpen()){

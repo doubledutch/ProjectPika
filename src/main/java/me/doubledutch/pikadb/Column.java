@@ -64,19 +64,45 @@ public class Column{
 		return page;
 	}
 
+	private static boolean addToSet(Variant v,ColumnResult result,ObjectSet set,Predicate predicate){
+		boolean shouldAdd=true;
+		if(predicate!=null){
+			shouldAdd=predicate.testVariant(v);
+		}
+		if(shouldAdd){
+			result.add(v);
+			return true;
+		}
+		return false;
+	}
+
 	protected static void scan(ColumnResult result,Page page,ObjectSet set,Predicate predicate) throws IOException{
 		result.incPageScanned();
 		DataInput in=page.getDataInput();
+		if(predicate!=null && page.isSorted()){
+			int type=predicate.getType();
+			if(type==Predicate.EQUALS || type==Predicate.LESSTHAN || type==Predicate.GREATERTHAN){
+				Variant vMax=Variant.readVariant(in,set);
+				result.incVariantRead();
+				if(vMax==null || vMax.getType()==Variant.DELETE){
+					return;
+				}
+				Variant vMin=Variant.readVariant(in,set);
+				result.incVariantRead();
+				if(vMin==null || vMin.getType()==Variant.DELETE){
+					addToSet(vMax,result,set,predicate);
+					return;
+				}
+				addToSet(vMax,result,set,predicate);
+				addToSet(vMin,result,set,predicate);
+				// System.out.println("so sorted");
+			}
+		}
 		Variant v=Variant.readVariant(in,set);
 		while(v!=null){
 			result.incVariantRead();
 			if(v.getType()!=Variant.SKIP){
-				boolean shouldAdd=true;
-				if(predicate!=null){
-					shouldAdd=predicate.testVariant(v);
-				}
-				if(shouldAdd){
-					result.add(v);
+				if(addToSet(v,result,set,predicate)){
 					if(!set.isOpen()){
 						if(set.getMatchCount()==set.getCount()){
 							return;
