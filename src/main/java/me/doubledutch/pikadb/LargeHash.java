@@ -3,15 +3,15 @@ package me.doubledutch.pikadb;
 import java.io.*;
 
 public class LargeHash{
-	private final static int SIZE=8; // Number of 32bit ints
-	private int[] hash;
+	private final static int SIZE=4; // Number of 32bit ints
+	private long[] hash;
 
-	public LargeHash(int[] data){
+	public LargeHash(long[] data){
 		this.hash=data;
 	}
 
 	public LargeHash(){
-		this.hash=new int[SIZE];
+		this.hash=new long[SIZE];
 	}
 
 	public void addHash(LargeHash data){
@@ -31,7 +31,7 @@ public class LargeHash{
 	}
 
 	public static int getSize(){ // actual size in bytes
-		return SIZE*4;
+		return SIZE*8;
 	}
 
 	public static int getIntegerCount(){
@@ -39,16 +39,16 @@ public class LargeHash{
 	}
 
 	public static LargeHash read(DataInput in) throws IOException{
-		int[] data=new int[SIZE];
+		long[] data=new long[SIZE];
 		for(int i=0;i<SIZE;i++){
-			data[i]=in.readInt();
+			data[i]=in.readLong();
 		}
 		return new LargeHash(data);
 	}
 
 	public void write(DataOutput out) throws IOException{
 		for(int i=0;i<SIZE;i++){
-			out.writeInt(hash[i]);
+			out.writeLong(hash[i]);
 		}
 	}
 
@@ -56,7 +56,7 @@ public class LargeHash{
 		StringBuilder buf=new StringBuilder();
 		for(int i=0;i<SIZE;i++){
 			if(i>0)buf.append("-");
-			buf.append(Integer.toBinaryString(hash[i]));
+			buf.append(Long.toBinaryString(hash[i]));
 		}
 		return buf.toString();
 	}

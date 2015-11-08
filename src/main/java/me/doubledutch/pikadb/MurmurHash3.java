@@ -18,27 +18,29 @@ final class MurmurHash3 {
   public static LargeHash getSelectiveBits(int oid){
     int h1=hashInt(0,oid);
     int h2=hashInt(h1,oid);
-    int h3=hashInt(h2,oid);
-    int num=LargeHash.getIntegerCount();
-    int[] data=new int[num];
-    int m=Math.abs(h1+h2)%32;
-    int bits=1<<m;
-    data[Math.abs(h1)%num]=bits;
+    // int h3=hashInt(h2,oid);
+    // int h4=hashInt(h3,oid);
 
-    m=Math.abs(h1+h3)%32;
-    bits=1<<m;
+    int num=LargeHash.getIntegerCount();
+    long[] data=new long[num];
+    /* int m=Math.abs(h1)%64;
+    long bits=1l<<m;
     data[Math.abs(h2)%num]=bits;
 
-    m=Math.abs(h1+h3+h2)%32;
-    bits=1<<m;
-    data[Math.abs(h3)%num]=bits;
+    m=Math.abs(h3)%64;
+    bits=1l<<m;
+    data[Math.abs(h4)%num]=bits;
+    
+    m=Math.abs(h3)%64;
+    bits=1l<<m;
+    data[Math.abs(h4)%num]=bits;
+*/
 
-
-    /*for(int i=0;i<num;i++){
-      int m=Math.abs(h1+i*h2)%32;
-      int bits=1<<m;
+    for(int i=0;i<num;i++){
+      int m=Math.abs(h1+i*h2)%64;
+      long bits=1l<<m;
       data[i]=bits;
-    }*/
+    }
     return new LargeHash(data);
   }
 

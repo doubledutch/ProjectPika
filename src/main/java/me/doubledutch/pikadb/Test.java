@@ -201,76 +201,44 @@ public class Test{
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/1000)/((post-pre)/1000.0))+" obj/s");
 			
-			System.out.println(" + Reading single objects (bloom test)");
-			
-			db=new PikaDB(filename);
-			users=db.declareTable("users");
-			// Prescan last to exercise bloom and not io
-			ResultSet obj=users.scan();
-
-			pre=System.currentTimeMillis();
-			obj=users.scan(1);
-			obj.getObjectList();
-			post=System.currentTimeMillis();
-			System.out.println("   - Read early object in "+(post-pre)+"ms");
-			// System.out.println(obj.getExecutionPlan().toString());
-			pre=System.currentTimeMillis();
-			obj=users.scan(RECORDS/2);
-			obj.getObjectList();
-			post=System.currentTimeMillis();
-			System.out.println("   - Read mid object in "+(post-pre)+"ms");
-			// System.out.println(obj.getExecutionPlan().toString());
-			pre=System.currentTimeMillis();
-			obj=users.scan(RECORDS-2);
-			obj.getObjectList();
-			post=System.currentTimeMillis();
-			System.out.println("   - Read late object in "+(post-pre)+"ms");
-			// System.out.println(obj.getExecutionPlan().toString());
-			db.close();
-			db=null;
-			
-
 			System.out.println(" + Predicate based queries");
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
-			obj=users.scan();
+			list=users.scan();
 			pre=System.currentTimeMillis();
-			obj=users.select("id","record_id","username").where("record_id").equalTo(1).execute();
-			obj.getObjectList();
+			list=users.select("id","record_id","username").where("record_id").equalTo(1).execute();
+			list.getObjectList();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read early object in "+(post-pre)+"ms");
 
 			pre=System.currentTimeMillis();
-			obj=users.select("id","record_id","username").where("record_id").equalTo(RECORDS/2).execute();
-			obj.getObjectList();
+			list=users.select("id","record_id","username").where("record_id").equalTo(RECORDS/2).execute();
+			list.getObjectList();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read mid object in "+(post-pre)+"ms");
 
 			pre=System.currentTimeMillis();
-			obj=users.select("id","record_id","username").where("record_id").equalTo(RECORDS-2).execute();
+			list=users.select("id","record_id","username").where("record_id").equalTo(RECORDS-2).execute();
 			
-			obj.getObjectList();
+			list.getObjectList();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read late object in "+(post-pre)+"ms");
-			System.out.println(obj.getExecutionPlan().toString(4));
-
+			System.out.println(list.getExecutionPlan().toString(4));
+			System.out.println(list.getObjectList().get(0).toString());
 			pre=System.currentTimeMillis();
 			
-			obj=users.select("id","record_id","username").where("record_id").lessThan(1000).execute();
+			list=users.select("id","record_id","username").where("record_id").lessThan(1000).execute();
 			
 
-			obj.getObjectList();
-			post=System.currentTimeMillis();
-			System.out.println("   - Read 1000 late objects in "+(post-pre)+"ms "+(int)((1000)/((post-pre)/1000.0))+" obj/s");
-			
-			pre=System.currentTimeMillis();
-			obj=users.select("id","record_id","username").where("record_id").greaterThan(RECORDS-1000).execute();
-			/*for(JSONObject jobj:obj.getObjectList()){
-				System.out.println(jobj.toString());
-			}*/
-			obj.getObjectList();
+			list.getObjectList();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read 1000 early objects in "+(post-pre)+"ms "+(int)((1000)/((post-pre)/1000.0))+" obj/s");
+			
+			pre=System.currentTimeMillis();
+			list=users.select("id","record_id","username").where("record_id").greaterThan(RECORDS-1000).execute();
+			list.getObjectList();
+			post=System.currentTimeMillis();
+			System.out.println("   - Read 1000 late objects in "+(post-pre)+"ms "+(int)((1000)/((post-pre)/1000.0))+" obj/s");
 
 			/*
 
