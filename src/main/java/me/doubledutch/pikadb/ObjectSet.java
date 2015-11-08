@@ -15,11 +15,12 @@ public class ObjectSet{
 		this.open=open;
 	}
 
-	public boolean anyObjectsInBloomFilter(long bloomfilter){
+	public boolean anyObjectsInBloomFilter(LargeHash bloomfilter){
 		// TODO: look into maintaining a separate set of hashed oid's
 		for(int oid:oidSet){
-			long hoid=MurmurHash3.getSelectiveBits(oid);
-			if((hoid & bloomfilter) == hoid){
+			LargeHash hoid=MurmurHash3.getSelectiveBits(oid);
+			// if((hoid & bloomfilter) == hoid){
+			if(bloomfilter.containsHash(hoid)){
 				return true;
 			}
 		}

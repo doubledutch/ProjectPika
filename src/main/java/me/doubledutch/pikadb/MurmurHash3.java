@@ -21,10 +21,10 @@ final class MurmurHash3 {
     int h2=hashInt(h1,oid);
     int num=LargeHash.getIntegerCount();
     int[] data=new int[num];
-        for(int i=0;i<num;i++){
+    for(int i=0;i<num;i++){
       int m=Math.abs(h1+i*h2)%32;
       int bits=1<<m;
-      data[i]=m;
+      data[i]=bits;
     }
     return new LargeHash(data);
   }

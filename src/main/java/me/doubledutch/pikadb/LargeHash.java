@@ -3,11 +3,31 @@ package me.doubledutch.pikadb;
 import java.io.*;
 
 public class LargeHash{
-	private final static int SIZE=4; // Number of 32bit ints
+	private final static int SIZE=6; // Number of 32bit ints
 	private int[] hash;
 
 	public LargeHash(int[] data){
 		this.hash=data;
+	}
+
+	public LargeHash(){
+		this.hash=new int[SIZE];
+	}
+
+	public void addHash(LargeHash data){
+		for(int i=0;i<SIZE;i++){
+			hash[i]=hash[i]|data.hash[i];
+		}
+	}
+
+	public boolean containsHash(LargeHash data){
+		for(int i=0;i<SIZE;i++){
+			if((hash[i] & data.hash[i]) != data.hash[i]){
+				return false;
+			}
+		}
+		return true;
+		// (bloomfilter & bits) == bits;
 	}
 
 	public static int getSize(){ // actual size in bytes
@@ -32,5 +52,12 @@ public class LargeHash{
 		}
 	}
 
-
+	public String toString(){
+		StringBuilder buf=new StringBuilder();
+		for(int i=0;i<SIZE;i++){
+			if(i>0)buf.append("-");
+			buf.append(Integer.toBinaryString(hash[i]));
+		}
+		return buf.toString();
+	}
 }

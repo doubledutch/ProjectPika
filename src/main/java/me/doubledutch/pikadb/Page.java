@@ -106,16 +106,17 @@ public class Page{
 	
 
 	public void addToBloomFilter(int oid){
-		long bits=MurmurHash3.getSelectiveBits(oid);
-		bloomfilter=bloomfilter | bits;
+		LargeHash hash=MurmurHash3.getSelectiveBits(oid);
+		// bloomfilter=bloomfilter | bits;
+		bloomfilter.addHash(hash);
 	}
 
 	public boolean isInBloomFilter(int oid){
-		long bits=MurmurHash3.getSelectiveBits(oid);
-		return (bloomfilter & bits) == bits;
+		LargeHash hash=MurmurHash3.getSelectiveBits(oid);
+		return bloomfilter.containsHash(hash);
 	}
 
-	public long getBloomFilter(){
+	public LargeHash getBloomFilter(){
 		return bloomfilter;
 	}
 

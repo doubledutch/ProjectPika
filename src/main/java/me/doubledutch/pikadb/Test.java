@@ -6,10 +6,24 @@ import org.json.*;
 
 public class Test{
 	public static void main(String args[]){
-		/*for(int l=0;l<20;l++){
-			System.out.println(Long.toBinaryString(MurmurHash3.getSelectiveBits(l))+", ");
-		}
-		if(true)return;*/
+		/*LargeHash a=MurmurHash3.getSelectiveBits(0);
+		LargeHash b=MurmurHash3.getSelectiveBits(1);
+		LargeHash c=MurmurHash3.getSelectiveBits(2);
+		
+		LargeHash bloom=new LargeHash();
+
+		System.out.println(a.toString());
+		System.out.println(b.toString());
+		System.out.println(c.toString());
+
+		bloom.addHash(a);
+		bloom.addHash(b);
+
+		System.out.println(bloom.toString());
+		System.out.println(bloom.containsHash(a)+" "+bloom.containsHash(b)+" "+bloom.containsHash(c));
+
+		if(true)return;
+*/
 		String filename="./test.data";
 		int RECORDS=100000;
 		try{	
