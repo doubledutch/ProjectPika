@@ -35,11 +35,7 @@ Current columns allow any value type to be stored in them. Implement optional pr
 
 ## 4. Query Engine
 
-While some uses of the database might use the current options to load either a single object by id or all object, we need support for a full predicate tree and a good api for constructing it that will allow us to experiment with different query languages on top of it.
-
-Take a predicate tree and use it to extract a result set from the database.
-
-A beautiful and easy to use user level api is the key to any success with this project. It should be easy to implement on top of a predicate engine and an execution engine based on a predicate tree - but the design of it will be anything but easy.
+Optimize the hashing algorithm to get the best possible spread on a set number of bits.
 
 Add a query planner that considers Cardinality / Indexes / Stats / to create intelligent query execution plans
 

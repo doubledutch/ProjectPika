@@ -6,6 +6,7 @@ import org.json.*;
 public class ObjectSet{
 	private Map<String,Map<Integer,Variant>> columnValueMap=new HashMap<String,Map<Integer,Variant>>();
 	private Set<Integer> oidSet=new LinkedHashSet<Integer>();
+	private Set<LargeHash> oidHashSet=new LinkedHashSet<LargeHash>();
 	// TODO: Check performance implications of using linked hash set
 
 	private boolean open;
@@ -15,15 +16,19 @@ public class ObjectSet{
 		this.open=open;
 	}
 
-	public boolean anyObjectsInBloomFilter(long bloomfilter){
-		// TODO: look into maintaining a separate set of hashed oid's
-		for(int oid:oidSet){
-			long hoid=MurmurHash3.getSelectiveBits(oid);
-			if((hoid & bloomfilter) == hoid){
+	public boolean anyObjectsInBloomFilter(LargeHash bloomfilter){
+		for(LargeHash hoid:oidHashSet){
+			// LargeHash hoid=MurmurHash3.getSelectiveBits(oid);
+			// if((hoid & bloomfilter) == hoid){
+			if(bloomfilter.containsHash(hoid)){
 				return true;
 			}
 		}
 		return false;
+	}
+
+	public void close(){
+		open=false;
 	}
 
 	public boolean isOpen(){
@@ -58,6 +63,7 @@ public class ObjectSet{
 		// objectMap.put(oid,obj)
 		// if(!oidSet.contains(oid)){
 			oidSet.add(oid);
+			oidHashSet.add(MurmurHash3.getSelectiveBits(oid));
 		// }
 		// objectList.add(obj);
 	}
