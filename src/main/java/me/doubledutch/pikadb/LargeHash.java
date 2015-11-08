@@ -16,11 +16,15 @@ public class LargeHash{
 
 	public static LargeHash read(DataInput in) throws IOException{
 		int[] data=new int[SIZE];
-		// for()
-		return null;
+		for(int i=0;i<SIZE;i++){
+			data[i]=in.readInt();
+		}
+		return new LargeHash(data);
 	}
 
 	public void write(DataOutput out) throws IOException{
-
+		for(int i=0;i<SIZE;i++){
+			out.writeInt(hash[i]);
+		}
 	}
 }
