@@ -8,7 +8,7 @@ public class Page{
 	public static int SORTED=1;
 	public static int UNSORTABLE=2;
 
-	public final static int HEADER=4+4+8+1+1; // nextPageId + currentFill + bloomFilter + type + end of page marker
+	public final static int HEADER=4+4+LargeHash.getSize()+1+1; // nextPageId + currentFill + bloomFilter + type + end of page marker
 	public final static int PAYLOAD=2048-HEADER;
 	public final static int SIZE=PAYLOAD+HEADER;
 	// TODO: add stop byte after data payload when creating and updating the file
@@ -20,7 +20,8 @@ public class Page{
 	private byte[] rawData;
 	private int currentFill=0;
 	private int nextPageId=-1;
-	private long bloomfilter=0;
+	// private long bloomfilter=0;
+	private LargeHash bloomfilter=null;
 	private int type=UNSORTED;
 
 	private PageFile pageHandler;
@@ -88,7 +89,8 @@ public class Page{
 		pageFile.seek(offset);
 		pageFile.writeInt(nextPageId);
 		pageFile.writeInt(currentFill);
-		pageFile.writeLong(bloomfilter);
+		// pageFile.writeLong(bloomfilter);
+		bloomfilter.write(pageFile);
 		pageFile.writeByte(type);
 	}
 
@@ -96,7 +98,8 @@ public class Page{
 		pageFile.seek(offset);
 		nextPageId=pageFile.readInt();
 		currentFill=pageFile.readInt();
-		bloomfilter=pageFile.readLong();
+		// bloomfilter=pageFile.readLong();
+		bloomfilter=LargeHash.read(pageFile);
 		type=pageFile.readByte();
 	}
 

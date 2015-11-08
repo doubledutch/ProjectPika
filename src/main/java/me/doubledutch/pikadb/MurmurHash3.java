@@ -16,16 +16,17 @@ final class MurmurHash3 {
   private static final int C2 = 0x1b873593;
 
 
-  public static long getSelectiveBits(int oid){
+  public static LargeHash getSelectiveBits(int oid){
     int h1=hashInt(0,oid);
     int h2=hashInt(h1,oid);
-    // 5 seems to be the magic recommended number for this
-    long bits=0;
-    for(int i=0;i<1;i++){
-      int m=Math.abs(h1+i*h2)%64;
-      bits|=1l<<m;
+    int num=LargeHash.getIntegerCount();
+    int[] data=new int[num];
+        for(int i=0;i<num;i++){
+      int m=Math.abs(h1+i*h2)%32;
+      int bits=1<<m;
+      data[i]=m;
     }
-    return bits;
+    return new LargeHash(data);
   }
 
   public static int hashInt(int seed,int input) {

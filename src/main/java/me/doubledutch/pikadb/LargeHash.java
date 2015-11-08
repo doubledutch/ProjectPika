@@ -14,6 +14,10 @@ public class LargeHash{
 		return SIZE*4;
 	}
 
+	public static int getIntegerCount(){
+		return SIZE;
+	}
+
 	public static LargeHash read(DataInput in) throws IOException{
 		int[] data=new int[SIZE];
 		for(int i=0;i<SIZE;i++){
@@ -27,4 +31,6 @@ public class LargeHash{
 			out.writeInt(hash[i]);
 		}
 	}
+
+
 }
