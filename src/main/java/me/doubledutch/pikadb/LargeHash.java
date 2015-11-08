@@ -3,7 +3,7 @@ package me.doubledutch.pikadb;
 import java.io.*;
 
 public class LargeHash{
-	private final static int SIZE=6; // Number of 32bit ints
+	private final static int SIZE=8; // Number of 32bit ints
 	private int[] hash;
 
 	public LargeHash(int[] data){
