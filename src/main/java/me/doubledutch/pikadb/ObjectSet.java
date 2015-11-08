@@ -17,7 +17,6 @@ public class ObjectSet{
 	}
 
 	public boolean anyObjectsInBloomFilter(LargeHash bloomfilter){
-		// TODO: look into maintaining a separate set of hashed oid's
 		for(LargeHash hoid:oidHashSet){
 			// LargeHash hoid=MurmurHash3.getSelectiveBits(oid);
 			// if((hoid & bloomfilter) == hoid){
@@ -26,6 +25,10 @@ public class ObjectSet{
 			}
 		}
 		return false;
+	}
+
+	public void close(){
+		open=false;
 	}
 
 	public boolean isOpen(){

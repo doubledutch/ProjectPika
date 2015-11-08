@@ -88,17 +88,19 @@ public class Query{
 
 	private ObjectSet executePredicate(String columnName,Predicate predicate) throws IOException,JSONException{
 		// System.out.println("Executing predicate on "+columnName);
-		ObjectSet closedSet=new ObjectSet(false);
+		// ObjectSet closedSet=new ObjectSet(false);
 		ObjectSet openSet=new ObjectSet(true);
 		ResultSet rs=table.scan(openSet,new String[]{columnName},predicate);
 		long tStart=System.nanoTime();
+		openSet.close();
+		/*
 		for(Variant v:openSet.getVariants(columnName)){
 			// if(predicate.testVariant(v)){
 				// System.out.println("Found one in "+columnName+" for "+v.getOID());
 				closedSet.addOID(v.getOID());
 				closedSet.addVariant(columnName,v);
 			// }
-		}
+		}*/
 		long tEnd=System.nanoTime();
 		result.addExecutionPlan(rs.getExecutionPlan());
 		/*JSONObject obj=new JSONObject();
@@ -107,6 +109,6 @@ public class Query{
 		obj.put("time",(tEnd-tStart));
 		obj.put("variants.compared",openSet.getCount());
 		result.addExecutionPlan(obj);*/
-		return closedSet;
+		return openSet;
 	}
 }
