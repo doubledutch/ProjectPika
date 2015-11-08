@@ -75,7 +75,6 @@ public abstract class Variant implements Comparable<Variant>{
 
 	public static Variant readVariant(DataInput in,ObjectSet set) throws IOException{
 		byte type=in.readByte();
-		int count=0;
 		if(type==DELETE){
 			// TODO: check that this works and think about an accumulative fix
 			return new Variant.Skip(1);
@@ -632,15 +631,6 @@ public abstract class Variant implements Comparable<Variant>{
 			out.writeLong(value);
 		}
 
-		public byte[] toByteArray() throws IOException{
-			ByteArrayOutputStream data=new ByteArrayOutputStream();
-			DataOutputStream out=new DataOutputStream(data);
-			writeVariant(out);
-			out.flush();
-			out.close();
-			return data.toByteArray();
-		}
-
 		public static Variant.Short readValue(int oid,DataInput in) throws IOException{
 			return new Variant.Short(oid,in.readShort());
 		}
@@ -728,15 +718,6 @@ public abstract class Variant implements Comparable<Variant>{
 			out.writeByte(BYTE);
 			out.writeInt(oid);
 			out.writeLong(value);
-		}
-
-		public byte[] toByteArray() throws IOException{
-			ByteArrayOutputStream data=new ByteArrayOutputStream();
-			DataOutputStream out=new DataOutputStream(data);
-			writeVariant(out);
-			out.flush();
-			out.close();
-			return data.toByteArray();
 		}
 
 		public static Variant.Byte readValue(int oid,DataInput in) throws IOException{
