@@ -55,6 +55,10 @@ public class Page{
 		return type==SORTED;
 	}
 
+	public boolean isSortable(){
+		return type!=UNSORTABLE;
+	}
+
 	public void setSorted(boolean val){
 		if(val){
 			type=SORTED;

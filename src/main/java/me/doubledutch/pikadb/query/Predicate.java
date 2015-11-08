@@ -7,15 +7,15 @@ import org.json.*;
 import me.doubledutch.pikadb.ResultSet;
 
 public class Predicate{
-	protected static final int EQUALS=0;
-	protected static final int LESSTHAN=1;
-	protected static final int GREATERTHAN=2;
-	protected static final int LIKE=3;
-	protected static final int ISNULL=4;
-	protected static final int OR=5;
-	protected static final int AND=6;
-	protected static final int NOT=7;
-	protected static final int WHERE=8;
+	public static final int EQUALS=0;
+	public static final int LESSTHAN=1;
+	public static final int GREATERTHAN=2;
+	public static final int LIKE=3;
+	public static final int ISNULL=4;
+	public static final int OR=5;
+	public static final int AND=6;
+	public static final int NOT=7;
+	public static final int WHERE=8;
 
 	private Query query;
 	private String column;
@@ -47,7 +47,11 @@ public class Predicate{
 		return query.execute();
 	}
 
-	protected int getType(){
+	public Variant getValue(){
+		return value;
+	}
+
+	public int getType(){
 		return type;
 	}
 
@@ -87,6 +91,20 @@ public class Predicate{
 
 	public Predicate equalTo(int v){
 		Predicate p=new Predicate(query,EQUALS,new Variant.Integer(-1,v));
+		leftChild=p;
+		return p;
+		// TODO: check that this can only be created on a where predicate
+	}
+
+	public Predicate lessThan(int v){
+		Predicate p=new Predicate(query,LESSTHAN,new Variant.Integer(-1,v));
+		leftChild=p;
+		return p;
+		// TODO: check that this can only be created on a where predicate
+	}
+
+	public Predicate greaterThan(int v){
+		Predicate p=new Predicate(query,GREATERTHAN,new Variant.Integer(-1,v));
 		leftChild=p;
 		return p;
 		// TODO: check that this can only be created on a where predicate
@@ -134,6 +152,8 @@ public class Predicate{
 		// System.out.println("testVariant "+v.getType()+" vs "+value.getType());
 		switch(type){
 			case EQUALS:return v.compareTo(value)==0;
+			case LESSTHAN:return v.compareTo(value)==1;
+			case GREATERTHAN:return v.compareTo(value)==-1;
 			case OR:return leftChild.testVariant(v) || rightChild.testVariant(v);
 		}
 		return false;

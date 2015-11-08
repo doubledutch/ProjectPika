@@ -76,7 +76,7 @@ public class PikaDB{
 	}
 
 	public void save() throws IOException{
-		pageFile.saveChanges(false);
+		pageFile.saveChanges();
 	}
 	public void close() throws IOException{
 		pageFile.close();

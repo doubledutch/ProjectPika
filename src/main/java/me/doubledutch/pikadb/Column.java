@@ -2,6 +2,7 @@ package me.doubledutch.pikadb;
 
 import java.util.*;
 import java.io.*;
+import me.doubledutch.pikadb.query.*;
 
 public class Column{
 	private PageFile pageFile;
@@ -49,30 +50,85 @@ public class Column{
 			int nextPageId=page.getNextPageId();
 			if(nextPageId==-1){
 				Page next=pageFile.createPage();
-				if(!sortable){
-					next.makeUnsortable();
-				}
 				page.setNextPageId(next.getId());
 				page=next;
 			}else{
 				page=pageFile.getPage(nextPageId);
+
 			}
 		}
 		knownFreePageId=page.getId();
+		if(!sortable){
+			page.makeUnsortable();
+		}
 		return page;
 	}
 
-	protected static void scan(ColumnResult result,Page page,ObjectSet set) throws IOException{
+	private static boolean addToSet(Variant v,ColumnResult result,ObjectSet set,Predicate predicate){
+		boolean shouldAdd=true;
+		if(predicate!=null){
+			shouldAdd=predicate.testVariant(v);
+		}
+		if(shouldAdd){
+			result.add(v);
+			return true;
+		}
+		return false;
+	}
+
+	protected static void scan(ColumnResult result,Page page,ObjectSet set,Predicate predicate) throws IOException{
 		result.incPageScanned();
 		DataInput in=page.getDataInput();
+		if(predicate!=null && page.isSorted()){
+			int type=predicate.getType();
+			if(type==Predicate.EQUALS || type==Predicate.LESSTHAN || type==Predicate.GREATERTHAN){
+				Variant vMax=Variant.readVariant(in,set);
+				result.incVariantRead();
+				if(vMax==null || vMax.getType()==Variant.DELETE){
+					return;
+				}
+				Variant vMin=Variant.readVariant(in,set);
+				result.incVariantRead();
+				if(vMin==null || vMin.getType()==Variant.DELETE){
+					addToSet(vMax,result,set,predicate);
+					return;
+				}
+				// Variant.createVariant(0,5).compareTo(Variant.createVariant(1,10))
+				// 1
+				Variant value=predicate.getValue();
+				int c1=value.compareTo(vMin);
+				int c2=value.compareTo(vMax);
+
+				if(type==Predicate.EQUALS){
+					if(c1==1){ // vMin > value
+						return;
+					}
+					if(c2==-1){ // vMax < value
+						return;
+					}
+				}else if(type==Predicate.LESSTHAN){
+					if(c1==1){ // vMin > value
+						return;
+					}	
+				}else if(type==Predicate.GREATERTHAN){
+					if(c2==-1){ // vMax < value
+						return;
+					}
+				}
+				addToSet(vMax,result,set,predicate);
+				addToSet(vMin,result,set,predicate);
+				// System.out.println("so sorted");
+			}
+		}
 		Variant v=Variant.readVariant(in,set);
 		while(v!=null){
 			result.incVariantRead();
 			if(v.getType()!=Variant.SKIP){
-				result.add(v);
-				if(!set.isOpen()){
-					if(set.getMatchCount()==set.getCount()){
-						return;
+				if(addToSet(v,result,set,predicate)){
+					if(!set.isOpen()){
+						if(set.getMatchCount()==set.getCount()){
+							return;
+						}
 					}
 				}
 			}
@@ -82,19 +138,27 @@ public class Column{
 	}
 
 	public ColumnResult scan(ObjectSet set) throws IOException{
+		return scan(set,null);
+	}
+
+
+	public ColumnResult scan(ObjectSet set,Predicate predicate) throws IOException{
 		set.resetMatchCounter();
 		String operation="column.scan";
 		if(!set.isOpen()){
 			operation="column.seek";
+		}
+		if(predicate!=null){
+			operation="column.query";
 		}
 		ColumnResult result=new ColumnResult(name,operation);
 		result.startTimer();
 		Page page=pageFile.getPage(rootId);
 		while(page!=null){
 			if((!set.isOpen()) && set.anyObjectsInBloomFilter(page.getBloomFilter())){
-				scan(result,page,set);
+				scan(result,page,set,predicate);
 			}else if(set.isOpen()){
-				scan(result,page,set);
+				scan(result,page,set,predicate);
 			}else{
 				result.incPageSkipped();
 			}
@@ -118,7 +182,7 @@ public class Column{
 	public static void sort(Page page) throws IOException{
 		ObjectSet set=new ObjectSet(true);
 		ColumnResult result=new ColumnResult("","");
-		scan(result,page,set);
+		scan(result,page,set,null);
 		List<Variant> list=result.getVariantList();	
 		Collections.sort(list);	
 		Variant last=list.remove(list.size()-1);

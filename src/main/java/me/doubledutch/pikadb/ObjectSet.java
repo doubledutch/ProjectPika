@@ -62,6 +62,7 @@ public class ObjectSet{
 		// objectList.add(obj);
 	}
 
+
 	public JSONObject getObject(Integer oid)throws JSONException{
 		if(!oidSet.contains(oid)){
 			return null;
@@ -76,6 +77,26 @@ public class ObjectSet{
 		}
 		return obj;
 		// return objectMap.get(oid);
+	}
+
+	public void addVariantList(String columnName,List<Variant> list){
+		if(!columnValueMap.containsKey(columnName)){
+			columnValueMap.put(columnName,new HashMap<Integer,Variant>());
+		}
+		Map<Integer,Variant> map=columnValueMap.get(columnName);
+		for(Variant v:list){
+			Integer oid=v.getOID();
+			if(!oidSet.contains(oid)){
+				if(!open){
+					continue;
+				}else{
+					addOID(oid);
+					map.put(oid,v);
+				}
+			}else{
+				map.put(oid,v);
+			}
+		}
 	}
 
 	public void addVariant(String columnName,Variant v){ 
