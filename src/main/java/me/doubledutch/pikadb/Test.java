@@ -4,30 +4,14 @@ import java.io.*;
 import java.util.*;
 import org.json.*;
 
+import java.sql.*;
+
 public class Test{
 	public static void main(String args[]){
-		/*LargeHash a=MurmurHash3.getSelectiveBits(0);
-		LargeHash b=MurmurHash3.getSelectiveBits(1);
-		LargeHash c=MurmurHash3.getSelectiveBits(2);
-		
-		LargeHash bloom=new LargeHash();
-
-		System.out.println(a.toString());
-		System.out.println(b.toString());
-		System.out.println(c.toString());
-
-		bloom.addHash(a);
-		bloom.addHash(b);
-
-		System.out.println(bloom.toString());
-		System.out.println(bloom.containsHash(a)+" "+bloom.containsHash(b)+" "+bloom.containsHash(c));
-
-		if(true)return;
-*/
 		String filename="./test.data";
 		int RECORDS=100000;
 		try{	
-			System.out.println(" + Writing "+RECORDS+" objects");
+			
 			String[] firstNames=new String[]{"James","John","Robert","Michael","William","David","Richard","Charles","Joseph","Thomas",
 										"Mary","Patricia","Linda","Barbara","Elizabeth","Jennifer","Maria","Susan","Margaret","Dorothy",
 										"Christopher","Daniel","Paul","Mark","Donald","George","Kenneth","Steven","Brian","Anthony",
@@ -43,6 +27,267 @@ public class Test{
 										"Wood","Barnes","Ross","Henderson","Coleman","Jenkins","Perry","Powell","Long","Patterson",
 										"Hughes","Flores","Washington","Butler","Simmons","Foster","Bryant","Alexander","Diaz",
 										"Myers","Ford","Rice","West","Jordan","Owens","Fisher","Harrison","Gibson","Cruz"};
+			
+			/*
+
+			// create table raw_users (record_id int not null,id varchar(38) not null, firstname varchar(128), lastname varchar(128),username varchar(256),image varchar(256));
+			// create table fast_users (record_id int not null,id varchar(38) not null, firstname varchar(128), lastname varchar(128),username varchar(256),image varchar(256));
+			// create index ndx_users on fast_users(record_id);
+
+
+			Class.forName("org.postgresql.Driver");
+			Connection con= DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/benchdb","bench","test123");
+			Statement st=con.createStatement();
+			st.executeUpdate("DELETE FROM raw_users");
+			st.executeUpdate("DELETE FROM fast_users");
+			st.executeUpdate("VACUUM FULL");
+			PreparedStatement stInsert=con.prepareStatement("INSERT INTO raw_users (record_id,id,firstName,lastName,username,image) VALUES(?,?,?,?,?,?)");
+			System.out.println("PostgreSQL no index");
+			System.out.println(" + Writing "+RECORDS+" objects");
+			long t1=System.currentTimeMillis();
+			for(int i=0;i<RECORDS;i++){
+				stInsert.setInt(1,i);
+				stInsert.setString(2,java.util.UUID.randomUUID().toString());
+				String firstName=firstNames[(int)(Math.random()*firstNames.length)];
+				stInsert.setString(3,firstName);
+				String lastName=lastNames[(int)(Math.random()*lastNames.length)];
+				stInsert.setString(4,lastName);
+				stInsert.setString(5,firstName+"."+lastName+"."+i);
+				stInsert.setString(6,"http://some-great-service/img/profile-"+i+".png");
+				stInsert.executeUpdate();
+			}
+			long t2=System.currentTimeMillis();
+			System.out.println("   - Write in "+(t2-t1)+"ms "+(int)(RECORDS/((t2-t1)/1000.0))+" obj/s");
+			System.gc();
+			System.out.println(" + Reading full objects - 100%");
+			t1=System.currentTimeMillis();
+			PreparedStatement stSelect=con.prepareStatement("SELECT record_id,id,firstName,lastName,username,image FROM raw_users");
+			java.sql.ResultSet rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("id",rs.getString(2));
+				obj.put("firstName",rs.getString(3));
+				obj.put("lastName",rs.getString(4));
+				obj.put("username",rs.getString(5));
+				obj.put("image",rs.getString(6));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read in "+(t2-t1)+"ms "+(int)(RECORDS/((t2-t1)/1000.0))+" obj/s");
+			System.gc();
+
+			System.out.println(" + Reading two columns - 100%");
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,username FROM raw_users");
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("username",rs.getString(2));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read in "+(t2-t1)+"ms "+(int)(RECORDS/((t2-t1)/1000.0))+" obj/s");
+			System.gc();
+
+
+			System.out.println(" + Predicate based queries");
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,id,firstName,lastName,username,image FROM raw_users WHERE record_id=2");
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("id",rs.getString(2));
+				obj.put("firstName",rs.getString(3));
+				obj.put("lastName",rs.getString(4));
+				obj.put("username",rs.getString(5));
+				obj.put("image",rs.getString(6));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read early object in "+(t2-t1)+"ms");
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,id,firstName,lastName,username,image FROM raw_users WHERE record_id="+(RECORDS/2));
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("id",rs.getString(2));
+				obj.put("firstName",rs.getString(3));
+				obj.put("lastName",rs.getString(4));
+				obj.put("username",rs.getString(5));
+				obj.put("image",rs.getString(6));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read mid object in "+(t2-t1)+"ms");
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,id,firstName,lastName,username,image FROM raw_users WHERE record_id="+(RECORDS-2));
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("id",rs.getString(2));
+				obj.put("firstName",rs.getString(3));
+				obj.put("lastName",rs.getString(4));
+				obj.put("username",rs.getString(5));
+				obj.put("image",rs.getString(6));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read late object in "+(t2-t1)+"ms");
+
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,id,firstName,lastName,username,image FROM raw_users WHERE record_id<100");
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("id",rs.getString(2));
+				obj.put("firstName",rs.getString(3));
+				obj.put("lastName",rs.getString(4));
+				obj.put("username",rs.getString(5));
+				obj.put("image",rs.getString(6));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read 100 early objects in "+(t2-t1)+"ms "+(int)(100/((t2-t1)/1000.0))+" obj/s");
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,id,firstName,lastName,username,image FROM raw_users WHERE record_id>"+(RECORDS-100));
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("id",rs.getString(2));
+				obj.put("firstName",rs.getString(3));
+				obj.put("lastName",rs.getString(4));
+				obj.put("username",rs.getString(5));
+				obj.put("image",rs.getString(6));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read 100 late objects in "+(t2-t1)+"ms "+(int)(100/((t2-t1)/1000.0))+" obj/s");
+			System.gc();
+
+			System.out.println("PostgreSQL with index");
+			stInsert=con.prepareStatement("INSERT INTO fast_users (record_id,id,firstName,lastName,username,image) VALUES(?,?,?,?,?,?)");
+			System.out.println(" + Writing "+RECORDS+" objects");
+			t1=System.currentTimeMillis();
+			for(int i=0;i<RECORDS;i++){
+				stInsert.setInt(1,i);
+				stInsert.setString(2,java.util.UUID.randomUUID().toString());
+				String firstName=firstNames[(int)(Math.random()*firstNames.length)];
+				stInsert.setString(3,firstName);
+				String lastName=lastNames[(int)(Math.random()*lastNames.length)];
+				stInsert.setString(4,lastName);
+				stInsert.setString(5,firstName+"."+lastName+"."+i);
+				stInsert.setString(6,"http://some-great-service/img/profile-"+i+".png");
+				stInsert.executeUpdate();
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Write in "+(t2-t1)+"ms "+(int)(RECORDS/((t2-t1)/1000.0))+" obj/s");
+			System.gc();
+			System.out.println(" + Reading full objects - 100%");
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,id,firstName,lastName,username,image FROM fast_users");
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("id",rs.getString(2));
+				obj.put("firstName",rs.getString(3));
+				obj.put("lastName",rs.getString(4));
+				obj.put("username",rs.getString(5));
+				obj.put("image",rs.getString(6));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read in "+(t2-t1)+"ms "+(int)(RECORDS/((t2-t1)/1000.0))+" obj/s");
+			System.gc();
+
+			System.out.println(" + Reading two columns - 100%");
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,username FROM fast_users");
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("username",rs.getString(2));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read in "+(t2-t1)+"ms "+(int)(RECORDS/((t2-t1)/1000.0))+" obj/s");
+			System.gc();
+
+			System.out.println(" + Predicate based queries");
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,id,firstName,lastName,username,image FROM fast_users WHERE record_id=2");
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("id",rs.getString(2));
+				obj.put("firstName",rs.getString(3));
+				obj.put("lastName",rs.getString(4));
+				obj.put("username",rs.getString(5));
+				obj.put("image",rs.getString(6));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read early object in "+(t2-t1)+"ms");
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,id,firstName,lastName,username,image FROM fast_users WHERE record_id="+(RECORDS/2));
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("id",rs.getString(2));
+				obj.put("firstName",rs.getString(3));
+				obj.put("lastName",rs.getString(4));
+				obj.put("username",rs.getString(5));
+				obj.put("image",rs.getString(6));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read mid object in "+(t2-t1)+"ms");
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,id,firstName,lastName,username,image FROM fast_users WHERE record_id="+(RECORDS-2));
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("id",rs.getString(2));
+				obj.put("firstName",rs.getString(3));
+				obj.put("lastName",rs.getString(4));
+				obj.put("username",rs.getString(5));
+				obj.put("image",rs.getString(6));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read late object in "+(t2-t1)+"ms");
+
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,id,firstName,lastName,username,image FROM fast_users WHERE record_id<100");
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("id",rs.getString(2));
+				obj.put("firstName",rs.getString(3));
+				obj.put("lastName",rs.getString(4));
+				obj.put("username",rs.getString(5));
+				obj.put("image",rs.getString(6));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read 100 early objects in "+(t2-t1)+"ms "+(int)(100/((t2-t1)/1000.0))+" obj/s");
+			t1=System.currentTimeMillis();
+			stSelect=con.prepareStatement("SELECT record_id,id,firstName,lastName,username,image FROM fast_users WHERE record_id>"+(RECORDS-100));
+			rs=stSelect.executeQuery();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("record_id",rs.getInt(1));
+				obj.put("id",rs.getString(2));
+				obj.put("firstName",rs.getString(3));
+				obj.put("lastName",rs.getString(4));
+				obj.put("username",rs.getString(5));
+				obj.put("image",rs.getString(6));
+			}
+			t2=System.currentTimeMillis();
+			System.out.println("   - Read 100 late objects in "+(t2-t1)+"ms "+(int)(100/((t2-t1)/1000.0))+" obj/s");
+			System.gc();
+			*/
+			System.out.println("PikaDB");
+			System.out.println(" + Writing "+RECORDS+" objects");
 			PikaDB db=new PikaDB(filename);
 			Table users=db.declareTable("users");
 			long pre=System.currentTimeMillis();
@@ -87,120 +332,27 @@ public class Test{
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
 			pre=System.currentTimeMillis();
-			list=users.scan();
+			list=users.select("*").execute();
 			list.getObjectList();
-			/*for(int i=0;i<RECORDS;i++){
-				JSONObject obj=list.get(i);
-				// System.out.println(obj.toString());
-				if(obj.getInt("id")!=i){
-					System.out.println("   - Data error!! at "+i);
-					System.out.println(obj.toString());
-					System.exit(0);
-				}
-			}*/
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
 			System.out.println("   - Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
 			System.gc();
 
-			System.out.println(" + Reading full objects - 50%");
+			System.out.println(" + Reading two columns - 100%");
 			
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
 			pre=System.currentTimeMillis();
-			ObjectSet set=new ObjectSet(false);
-			for(int i=0;i<RECORDS;i++){
-				if(i%2==0){
-					set.addOID(i);
-					
-				}
-			}
-			list=users.scan(set);
+			list=users.select("record_id","username").execute();
 			list.getObjectList();
 			db.close();
 			db=null;
 			post=System.currentTimeMillis();
-			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/2)/((post-pre)/1000.0))+" obj/s");
-			
+			System.out.println("   - Read in "+(post-pre)+"ms "+(int)(RECORDS/((post-pre)/1000.0))+" obj/s");
+			System.gc();
 
-			System.out.println(" + Reading full objects - 25%");
-			
-			db=new PikaDB(filename);
-			users=db.declareTable("users");
-			pre=System.currentTimeMillis();
-			set=new ObjectSet(false);
-			for(int i=0;i<RECORDS;i++){
-				if(i%4==0){
-					set.addOID(i);
-					
-				}
-			}
-			list=users.scan(set);
-			list.getObjectList();
-			db.close();
-			db=null;
-			post=System.currentTimeMillis();
-			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/4)/((post-pre)/1000.0))+" obj/s");
-			
-			System.out.println(" + Reading full objects - 5%");
-			
-			db=new PikaDB(filename);
-			users=db.declareTable("users");
-			pre=System.currentTimeMillis();
-			set=new ObjectSet(false);
-			for(int i=0;i<RECORDS;i++){
-				if(i%20==0){
-					set.addOID(i);
-					
-				}
-			}
-			list=users.scan(set);
-			list.getObjectList();
-			db.close();
-			db=null;
-			post=System.currentTimeMillis();
-			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/20)/((post-pre)/1000.0))+" obj/s");
-			
-			System.out.println(" + Reading full objects - 1%");
-			
-			db=new PikaDB(filename);
-			users=db.declareTable("users");
-			pre=System.currentTimeMillis();
-			set=new ObjectSet(false);
-			for(int i=0;i<RECORDS;i++){
-				if(i%100==0){
-					set.addOID(i);
-					
-				}
-			}
-			list=users.scan(set);
-			list.getObjectList();
-			db.close();
-			db=null;
-			post=System.currentTimeMillis();
-			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/100)/((post-pre)/1000.0))+" obj/s");
-			
-
-			System.out.println(" + Reading full objects - 0.1%");
-			
-			db=new PikaDB(filename);
-			users=db.declareTable("users");
-			pre=System.currentTimeMillis();
-			set=new ObjectSet(false);
-			for(int i=0;i<RECORDS;i++){
-				if(i%1000==0){
-					set.addOID(i);
-					
-				}
-			}
-			list=users.scan(set);
-			list.getObjectList();
-			db.close();
-			db=null;
-			post=System.currentTimeMillis();
-			System.out.println("   - Read in "+(post-pre)+"ms "+(int)((RECORDS/1000)/((post-pre)/1000.0))+" obj/s");
-			
 			System.out.println(" + Predicate based queries");
 			db=new PikaDB(filename);
 			users=db.declareTable("users");
@@ -223,23 +375,23 @@ public class Test{
 			list.getObjectList();
 			post=System.currentTimeMillis();
 			System.out.println("   - Read late object in "+(post-pre)+"ms");
+			// System.out.println(list.getExecutionPlan().toString(4));
+			// System.out.println(list.getObjectList().get(0).toString());
+			pre=System.currentTimeMillis();
+			
+			list=users.select("id","record_id","username").where("record_id").lessThan(100).execute();
+			
+
+			list.getObjectList();
+			post=System.currentTimeMillis();
+			System.out.println("   - Read 100 early objects in "+(post-pre)+"ms "+(int)((100)/((post-pre)/1000.0))+" obj/s");
+			
+			pre=System.currentTimeMillis();
+			list=users.select("id","record_id","username").where("record_id").greaterThan(RECORDS-100).execute();
+			list.getObjectList();
+			post=System.currentTimeMillis();
+			System.out.println("   - Read 100 late objects in "+(post-pre)+"ms "+(int)((100)/((post-pre)/1000.0))+" obj/s");
 			System.out.println(list.getExecutionPlan().toString(4));
-			System.out.println(list.getObjectList().get(0).toString());
-			pre=System.currentTimeMillis();
-			
-			list=users.select("id","record_id","username").where("record_id").lessThan(1000).execute();
-			
-
-			list.getObjectList();
-			post=System.currentTimeMillis();
-			System.out.println("   - Read 1000 early objects in "+(post-pre)+"ms "+(int)((1000)/((post-pre)/1000.0))+" obj/s");
-			
-			pre=System.currentTimeMillis();
-			list=users.select("id","record_id","username").where("record_id").greaterThan(RECORDS-1000).execute();
-			list.getObjectList();
-			post=System.currentTimeMillis();
-			System.out.println("   - Read 1000 late objects in "+(post-pre)+"ms "+(int)((1000)/((post-pre)/1000.0))+" obj/s");
-
 			/*
 
 
